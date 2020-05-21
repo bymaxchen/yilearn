@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.SemanticInfoMapper">
+
+	<insert id="createSemantic" useGeneratedKeys="true" keyProperty="id"
+			parameterType="com.zhuiyi.ms.learn.dto.request.RequestSemanticDto">
+		INSERT INTO t_learn_semantic_tags (
+		 name,identity,use_times,status,use_type,match_mode,custom_match_mode,key_words,create_user,
+		update_timestamp,update_time,create_timestamp,create_time,marks
+		)
+		VALUES (
+		#{name,jdbcType=VARCHAR},
+		#{identity,jdbcType=INTEGER},
+		#{useTimes,jdbcType=INTEGER},
+		#{status,jdbcType=INTEGER},
+		#{useType,jdbcType=INTEGER},
+		#{matchMode,jdbcType=VARCHAR},
+		#{customMatchMode,jdbcType=INTEGER},
+		#{keyWords,jdbcType=VARCHAR},
+		#{createUser,jdbcType=VARCHAR},
+		#{updateTimestamp,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=BIGINT},
+		#{createTimestamp,jdbcType=TIMESTAMP},
+		#{createTime,jdbcType=BIGINT},
+		#{marks,jdbcType=INTEGER}
+		)
+	</insert>
+
+	<update id="deleteSemantic" parameterType="java.lang.Integer">
+		update t_learn_semantic_tags
+		set status = -1
+		where id = #{id}
+	</update>
+
+	<update id="updateSemantic" parameterType="java.lang.Integer">
+		update t_learn_semantic_tags
+		<set>
+			<if test="name != null">name = #{name},</if>
+			<if test="identity != null">identity = #{identity},</if>
+			<if test="useTimes != null">use_times = #{useTimes},</if>
+			<if test="useType != null">use_type = #{useType},</if>
+			<if test="matchMode != null">match_mode = #{matchMode},</if>
+			<if test="customMatchMode != null">custom_match_mode = #{customMatchMode},</if>
+			<if test="keyWords != null">key_words = #{keyWords},</if>
+			<if test="marks != null">marks = #{marks},</if>
+			<if test="updateTime != null">update_time = #{updateTime},</if>
+			<if test="updateTimestamp != null">update_timestamp = #{updateTimestamp}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<select id="getSemantic" resultType="com.zhuiyi.ms.learn.dto.response.ResponseSemanticDto">
+		select a.name as name,a.identity as identity,a.use_times as useTimes,a.status as status,a.use_type as useType,
+		a.match_mode as matchMode,a.custom_match_mode as customMatchMode,a.key_words as keyWords,
+		a.create_user as createUser,a.create_time as createTime,a.create_timestamp as createTimestamp,
+		a.update_time as updateTime,a.update_timestamp as updateTimestamp,a.marks as marks,a.id as Id
+		from t_learn_semantic_tags a
+		where 1=1
+		<if test="id != null">
+			and	a.id = #{id}
+		</if>
+		and a.status > -1
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>;
+	</select>
+
+	<select id="countSemantic" resultType="java.lang.Integer">
+		select count(1)
+		from t_learn_semantic_tags a ;
+	</select>
+
+</mapper>

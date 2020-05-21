@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TChatLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TChatLog">
+        <id column="id" property="id" />
+        <result column="task_id" property="taskId" />
+        <result column="session_id" property="sessionId" />
+        <result column="chat_id" property="chatId" />
+        <result column="content" property="content" />
+        <result column="identity" property="identity" />
+        <result column="service_id" property="serviceId" />
+        <result column="service_name" property="serviceName" />
+        <result column="create_time" property="createTime" />
+        <result column="start_timestamp" property="startTimestamp" />
+        <result column="end_timestamp" property="endTimestamp" />
+        <result column="group_id" property="groupId" />
+        <result column="delete_status" property="deleteStatus" />
+        <result column="is_violation" property="isViolation" />
+        <result column="exam_part_question_id" property="examPartQuestionId" />
+        <result column="audio_src" property="audioSrc" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, task_id, session_id, chat_id, content, identity, service_id, service_name, create_time, start_timestamp, end_timestamp, group_id, delete_status, is_violation, exam_part_question_id, audio_src
+    </sql>
+
+</mapper>

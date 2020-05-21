@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TExamPartQuestionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TExamPartQuestion">
+        <id column="exam_part_question_id" property="examPartQuestionId" />
+        <result column="is _right" property="is Right" />
+        <result column="exam_part_id" property="examPartId" />
+        <result column="score_detail_id" property="scoreDetailId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        exam_part_question_id, is _right, exam_part_id, score_detail_id
+    </sql>
+
+</mapper>

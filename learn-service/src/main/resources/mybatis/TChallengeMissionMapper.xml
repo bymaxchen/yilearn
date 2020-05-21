@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TChallengeMissionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TChallengeMission">
+        <id column="id" property="id" />
+        <result column="challengeExamId" property="challengeExamId" />
+        <result column="challengeExamName" property="challengeExamName" />
+        <result column="agentList" property="agentList" />
+        <result column="startTime" property="startTime" />
+        <result column="status" property="status" />
+        <result column="createdAt" property="createdAt" />
+        <result column="updatedAt" property="updatedAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, challengeExamId, challengeExamName, agentList, startTime, status, createdAt, updatedAt
+    </sql>
+
+</mapper>

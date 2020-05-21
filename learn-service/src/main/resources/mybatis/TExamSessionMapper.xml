@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TExamSessionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TExamSession">
+        <id column="id" property="id" />
+        <result column="agentName" property="agentName" />
+        <result column="agentId" property="agentId" />
+        <result column="taskType" property="taskType" />
+        <result column="examId" property="examId" />
+        <result column="examName" property="examName" />
+        <result column="taskId" property="taskId" />
+        <result column="score" property="score" />
+        <result column="sessionId" property="sessionId" />
+        <result column="createdAt" property="createdAt" />
+        <result column="updatedAt" property="updatedAt" />
+        <result column="startTime" property="startTime" />
+        <result column="audioSrc" property="audioSrc" />
+        <result column="examQuestionType" property="examQuestionType" />
+        <result column="examQuestionTypeId" property="examQuestionTypeId" />
+        <result column="customerInfoTitleGroup" property="customerInfoTitleGroup" />
+        <result column="endTime" property="endTime" />
+        <result column="trainingType" property="trainingType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, agentName, agentId, taskType, examId, examName, taskId, score, sessionId, createdAt, updatedAt, startTime, audioSrc, examQuestionType, examQuestionTypeId, customerInfoTitleGroup, endTime, trainingType
+    </sql>
+
+</mapper>

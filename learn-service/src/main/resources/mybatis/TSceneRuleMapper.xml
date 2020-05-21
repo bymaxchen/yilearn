@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TSceneRuleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TSceneRule">
+        <id column="scene_rule_id" property="sceneRuleId" />
+        <result column="scene_rule_name" property="sceneRuleName" />
+        <result column="score" property="score" />
+        <result column="description" property="description" />
+        <result column="scene_rule_category_id" property="sceneRuleCategoryId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        scene_rule_id, scene_rule_name, score, description, scene_rule_category_id, create_time, update_time
+    </sql>
+
+    <select id="getInvolvedRulesBySemanticId" resultType="com.zhuiyi.ms.learn.dto.response.InvolvedRulesDto">
+        select scene_rule_id as ruleId, scene_rule_name as ruleName, rule_type as ruleType from  t_scene_rule
+        where conditions REGEXP  CONCAT('"checkValue":','${semanticId}','[},]' )
+        group by scene_rule_id;
+    </select>
+
+</mapper>

@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    druid:
+      type: com.alibaba.druid.pool.DruidDataSource
+      url: jdbc:log4jdbc:mysql://localhost:3306/ds_learn_business?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+      username: root
+      password: 123456
+      driverClassName: net.sf.log4jdbc.DriverSpy
+      initialSize: 1
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      validationQuery: SELECT 1
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+  resources:
+        static-locations:
+          - file:D://learn-download/
+  mvc:
+      static-path-pattern: /audio/**
+
+
+mybatis:
+  mapper-locations: classpath:mybatis/*.xml
+
+excel:
+  downLoadExcelUrl: d:/learn-download
+
+
+ttsurl: d:/learn-tts/
+educationPageSize: 1
+
+zhongAnUrl: https://zhs-test.zhongan.io/saas/zy/exerciseRecord
+zhongAn: false
+
+

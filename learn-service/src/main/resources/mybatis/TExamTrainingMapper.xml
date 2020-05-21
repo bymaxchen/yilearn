@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TExamTrainingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TExamTraining">
+        <id column="id" property="id" />
+        <result column="examName" property="examName" />
+        <result column="examId" property="examId" />
+        <result column="startTime" property="startTime" />
+        <result column="status" property="status" />
+        <result column="agentList" property="agentList" />
+        <result column="createdAt" property="createdAt" />
+        <result column="updatedAt" property="updatedAt" />
+        <result column="createUserName" property="createUserName" />
+        <result column="createUserId" property="createUserId" />
+        <result column="trainingType" property="trainingType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, examName, examId, startTime, status, agentList, createdAt, updatedAt, createUserName, createUserId, trainingType
+    </sql>
+
+    <select id="findAll"  resultType="com.zhuiyi.ms.learn.entity.vo.res.ExamTrainingResVO">
+        SELECT
+            t_exam_training.id,
+            agentList as agentListStr,
+            examName,
+            question_category_id,
+            status,
+            startTime
+        FROM
+            t_exam_training
+                LEFT OUTER JOIN t_base_question ON t_exam_training.examId = t_base_question.base_question_id
+        <where>
+            <if test="agent != null">
+                FIND_IN_SET( #{agent}, agentList )
+            </if>
+            <if test="keyword != null and keyword != ''">
+               and examName like "%"#{keyword}"%"
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="level != null">
+                and level = #{level}
+            </if>
+            <if test="questionCategoryId != null">
+                and question_category_id = #{questionCategoryId}
+            </if>
+        </where>
+        ORDER BY t_exam_training.create_time DESC
+    </select>
+
+</mapper>

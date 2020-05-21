@@ -1,0 +1,34 @@
+version: '3'
+services:
+  yilearn-web:
+    image: ccr.ccs.tencentyun.com/zhuiyi_docker_list/learn_yilearn-service-yb:latest
+    hostname: yilearn-service
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    env_file:
+      - yilearn-service.env.conf
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./logs:/data/app/yilearn/logs
+      - ./tts/:/data/app/yilearn/tts/
+    ports:
+      - "9366:9366"
+    networks:
+      - yilearn-network
+    entrypoint: ["bash", "/entrypoint.d/entrypoint.sh"]
+  yilearn-mysql:
+    image: ccr.ccs.tencentyun.com/zhuiyi_docker_list/mysql:5.6
+    hostname: mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    ports:
+      - "3307:3306"
+    networks:
+      - yilearn-network
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /data/db/yilearn/mysql:/var/lib/mysql
+networks:
+  yilearn-network:

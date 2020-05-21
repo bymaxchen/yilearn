@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TBaseQuestionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TBaseQuestion">
+        <id column="base_question_id" property="baseQuestionId" />
+        <result column="question_name" property="questionName" />
+        <result column="type" property="type" />
+        <result column="level" property="level" />
+        <result column="question_category_id" property="questionCategoryId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        base_question_id, question_name, type, level, question_category_id, create_time, update_time
+    </sql>
+
+    <select id="findAll" resultType="com.zhuiyi.ms.learn.entity.TBaseQuestion">
+        SELECT
+            base_question_id,
+            create_time,
+            level,
+            question_category_id,
+            update_time,
+            question_name,
+            type
+        FROM
+            t_base_question
+        <where>
+              <if test="type != null">
+                 type = #{type}
+              </if>
+             <if test="level != null">
+                 and level = #{level}
+             </if>
+            <if test="levelList != null and levelList.size() > 0">
+                and level IN
+                <foreach collection="levelList" item="item" index="index"  open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="baseQuestionId != null and questionName != null">
+                and ( base_question_id = #{baseQuestionId} or question_name LIKE "%"#{questionName}"%" )
+            </if>
+            <if test="baseQuestionId == null and questionName != null">
+                and question_name LIKE "%"#{questionName}"%"
+            </if>
+            <if test="categoryIdList != null and categoryIdList.size() > 0">
+                AND question_category_id IN
+                <foreach collection="categoryIdList" item="item" index="index"  open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY update_time desc
+    </select>
+
+</mapper>

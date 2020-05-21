@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TQuestionRuleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TQuestionRule">
+        <id column="question_rule_id" property="questionRuleId" />
+        <result column="question_rule_name" property="questionRuleName" />
+        <result column="score" property="score" />
+        <result column="description" property="description" />
+        <result column="question_rule_category_id" property="questionRuleCategoryId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        question_rule_id, question_rule_name, score, description, question_rule_category_id
+    </sql>
+
+    <select id="findAllByQuestionRuleIdList" resultType="com.zhuiyi.ms.learn.entity.bo.QuestionRuleCountBO">
+        SELECT
+        question_rule_id,
+        COUNT( * ) AS related_question_count
+        FROM
+        t_easy_question
+        WHERE
+        question_rule_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        GROUP BY
+        question_rule_id;
+    </select>
+
+    <select id="getInvolvedRulesBySemanticId" resultType="com.zhuiyi.ms.learn.dto.response.InvolvedRulesDto">
+        select question_rule_id as ruleId, question_rule_name as ruleName from  t_question_rule
+        where conditions REGEXP  CONCAT('"checkValue":','${semanticId}','[},]' )
+        group by question_rule_id;
+    </select>
+
+
+</mapper>

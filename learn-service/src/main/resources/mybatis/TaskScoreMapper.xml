@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TaskScoreMapper">
+  <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TaskScore">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="task_id" jdbcType="BIGINT" property="taskId" />
+    <result column="score_type" jdbcType="TINYINT" property="scoreType" />
+    <result column="question_name" jdbcType="VARCHAR" property="questionName" />
+    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
+    <result column="rule_name" jdbcType="VARCHAR" property="ruleName" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, task_id, score_type, question_name, node_name, rule_name, score, create_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_task_score
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <insert id="insert" parameterType="com.zhuiyi.ms.learn.entity.TaskScore">
+    insert into t_task_score (id, task_id, score_type, 
+      question_name, node_name, rule_name, 
+      score, create_time)
+    values (#{id,jdbcType=BIGINT}, #{taskId,jdbcType=BIGINT}, #{scoreType,jdbcType=TINYINT}, 
+      #{questionName,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{ruleName,jdbcType=VARCHAR}, 
+      #{score,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuiyi.ms.learn.entity.TaskScore">
+    insert into t_task_score
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="taskId != null">
+        task_id,
+      </if>
+      <if test="scoreType != null">
+        score_type,
+      </if>
+      <if test="questionName != null">
+        question_name,
+      </if>
+      <if test="nodeName != null">
+        node_name,
+      </if>
+      <if test="ruleName != null">
+        rule_name,
+      </if>
+      <if test="score != null">
+        score,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="taskId != null">
+        #{taskId,jdbcType=BIGINT},
+      </if>
+      <if test="scoreType != null">
+        #{scoreType,jdbcType=TINYINT},
+      </if>
+      <if test="questionName != null">
+        #{questionName,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeName != null">
+        #{nodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleName != null">
+        #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null">
+        #{score,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuiyi.ms.learn.entity.TaskScore">
+    update t_task_score
+    <set>
+      <if test="taskId != null">
+        task_id = #{taskId,jdbcType=BIGINT},
+      </if>
+      <if test="scoreType != null">
+        score_type = #{scoreType,jdbcType=TINYINT},
+      </if>
+      <if test="questionName != null">
+        question_name = #{questionName,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeName != null">
+        node_name = #{nodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleName != null">
+        rule_name = #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null">
+        score = #{score,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuiyi.ms.learn.entity.TaskScore">
+    update t_task_score
+    set task_id = #{taskId,jdbcType=BIGINT},
+      score_type = #{scoreType,jdbcType=TINYINT},
+      question_name = #{questionName,jdbcType=VARCHAR},
+      node_name = #{nodeName,jdbcType=VARCHAR},
+      rule_name = #{ruleName,jdbcType=VARCHAR},
+      score = #{score,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

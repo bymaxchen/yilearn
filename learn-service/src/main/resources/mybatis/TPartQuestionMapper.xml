@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TPartQuestionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TPartQuestion">
+        <id column="part_question_id" property="partQuestionId" />
+        <result column="paper_part_id" property="paperPartId" />
+        <result column="is_required" property="isRequired" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        part_question_id, paper_part_id, is_required
+    </sql>
+
+    <!--<update id="bulkUpdateProcessRules"  parameterType="java.util.List">-->
+        <!--UPDATE t_part_question-->
+        <!--SET process_rules =-->
+        <!--CASE-->
+        <!--<foreach collection="list" item="item" index="index">-->
+            <!--WHEN id = #{item.id} THEN #{item.faqCategoryId}-->
+        <!--</foreach>-->
+        <!--ELSE faq_category_id-->
+        <!--END-->
+        <!--WHERE-->
+        <!--id IN-->
+        <!--<foreach collection="list" index="index" item="item" open="(" separator="," close=")">-->
+            <!--#{item.id}-->
+        <!--</foreach>-->
+    <!--</update>-->
+
+</mapper>

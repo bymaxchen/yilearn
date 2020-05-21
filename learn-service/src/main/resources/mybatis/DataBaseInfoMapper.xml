@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.DataBaseInfoMapper">
+	<select id="getDbNameByBusId" resultType="java.lang.String">
+		select a.db_name from t_learn_business a
+		where 1=1
+		<if test="busId != null">
+			and a.bus_id = ${busId}
+		</if>
+		and a.is_delete = 0;
+	</select>
+
+	<update id="closeForeignKeyCheck">
+		SET FOREIGN_KEY_CHECKS = 0;
+	</update>
+
+	<update id="openForeignKeyCheck">
+		SET FOREIGN_KEY_CHECKS = 1;
+	</update>
+
+
+
+	<update id="createDataBusiness" parameterType="java.util.Map">
+		CREATE DATABASE IF NOT EXISTS ${dbName} DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+	</update>
+
+	<update id="createAudio" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_audio (
+		  `audio_id` int(11) NOT NULL AUTO_INCREMENT,
+		  `session_id` varchar(80) NOT NULL COMMENT '太保项目是session_id，在友邦项目或者标品当中，其实是exam_id',
+		  `mp3_url` varchar(255) DEFAULT NULL,
+		  `pcm_url` varchar(255) DEFAULT NULL,
+		  `status` tinyint(4) NOT NULL COMMENT '10: 音频还未拼接完成 20: 音频拼接完成且可播放 40: 音频损坏',
+		  `create_time` datetime DEFAULT NULL,
+		  `update_time` datetime DEFAULT NULL,
+		  `exam_id` varchar(64) DEFAULT NULL,
+		  PRIMARY KEY (`audio_id`) USING BTREE,
+		  KEY `exam_id` (`exam_id`) USING BTREE,
+		  CONSTRAINT `t_audio_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `t_exam` (`exam_id`) ON DELETE CASCADE ON UPDATE CASCADE
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT
+	</update>
+
+
+	<update id="createBaseQuestion" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_base_question (
+		  `base_question_id` int(11) NOT NULL AUTO_INCREMENT,
+		  `question_name` varchar(255) NOT NULL COMMENT '问题名称',
+		  `type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0表示问答题，1表示情景题',
+		  `level` tinyint(4) NOT NULL COMMENT '0:低；1中；2高',
+		  `question_category_id` int(11) DEFAULT NULL,
+		  `create_time` datetime DEFAULT NULL,
+		  `update_time` datetime DEFAULT NULL,
+		  PRIMARY KEY (`base_question_id`) USING BTREE,
+		  UNIQUE KEY `question_name` (`question_name`,`type`),
+		  KEY `question_category_id` (`question_category_id`) USING BTREE,
+		  CONSTRAINT `t_base_question_ibfk_1` FOREIGN KEY (`question_category_id`) REFERENCES `t_question_category` (`question_category_id`) ON DELETE SET NULL ON UPDATE CASCADE
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+	</update>
+
+
+	<update id="createChallengeExam" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_challenge_exam (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `challengeExamName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `examList` varchar(10192) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+		  `create_time` datetime NOT NULL,
+		  `update_time` datetime NOT NULL,
+		  PRIMARY KEY (`id`) USING BTREE
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT
+	</update>
+
+
+	<update id="createChallengeMission" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_challenge_mission (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `challengeExamId` int(11) NOT NULL DEFAULT '-1',
+		  `challengeExamName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `agentList` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `startTime` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `status` int(11) NOT NULL DEFAULT '1',
+		  `create_time` datetime NOT NULL,
+		  `update_time` datetime NOT NULL,
+		  PRIMARY KEY (`id`) USING BTREE
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT
+	</update>
+
+
+	<update id="createExamSession" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_exam_session (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `agentName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `agentId` int(11) NOT NULL DEFAULT '-1',
+		  `taskType` int(11) NOT NULL DEFAULT '1',
+		  `examId` int(11) NOT NULL DEFAULT '-1',
+		  `examName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `taskId` int(11) NOT NULL DEFAULT '-1',
+		  `score` int(11) NOT NULL DEFAULT '0',
+		  `sessionId` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `create_time` datetime NOT NULL,
+		  `update_time` datetime NOT NULL,
+		  `startTime` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `audioSrc` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `examQuestionType` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `examQuestionTypeId` int(11) NOT NULL DEFAULT '0',
+		  `customerInfoTitleGroup` varchar(2000) COLLATE utf8mb4_unicode_ci DEFAULT '[]',
+		  `endTime` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `trainingType` int(11) NOT NULL DEFAULT '0',
+		  `status` tinyint(2) DEFAULT '0' COMMENT '0表示未完成，1表示已完成',
+		  `mode` tinyint(2) DEFAULT '1' COMMENT '1表示练习，2表示考试，3表示学习',
+		  PRIMARY KEY (`id`) USING BTREE
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT
+	</update>
+
+	<update id="createExamTraining" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_exam_training (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `examName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `examId` int(11) NOT NULL DEFAULT '-1',
+		  `startTime` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `status` int(11) NOT NULL DEFAULT '1',
+		  `agentList` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `create_time` datetime NOT NULL,
+		  `update_time` datetime NOT NULL,
+		  `createUserName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+		  `createUserId` int(11) NOT NULL DEFAULT '-1',
+		  `trainingType` int(11) NOT NULL DEFAULT '0',
+		  PRIMARY KEY (`id`) USING BTREE
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT
+	</update>
+
+
+	<update id="createChatLog" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_chat_log (
+			`id` bigint(20) NOT NULL AUTO_INCREMENT,
+			`task_id` bigint(20) NOT NULL,
+			`session_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`chat_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+			`content` varchar(5000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`identity` tinyint(4) NOT NULL COMMENT 'èº«ä»½ï¼š1-åå¸­ 2-å®¢æˆ·',
+			`service_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`service_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`create_time` datetime(0) NULL DEFAULT NULL,
+			`start_timestamp` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+			`end_timestamp` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+			`group_id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '会话下标',
+			`delete_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0:未删除；1：删除',
+			`is_violation` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0: 未违规； 1：违规',
+			`exam_part_question_id` int(11) NULL DEFAULT NULL,
+			PRIMARY KEY (`id`) USING BTREE,
+			INDEX `task_id`(`task_id`) USING BTREE,
+			INDEX `exam_part_question_id`(`exam_part_question_id`) USING BTREE,
+			CONSTRAINT `t_chat_log_ibfk_1` FOREIGN KEY (`exam_part_question_id`) REFERENCES `t_exam_part_question` (`exam_part_question_id`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<update id="createCategory" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_learn_category (
+		`id` INT(11) NOT NULL AUTO_INCREMENT,
+		`name` VARCHAR(255) NULL DEFAULT NULL,
+		`category_level` INT(11) NULL DEFAULT NULL,
+		`parent_id` INT(11) NULL DEFAULT NULL,
+		`status` TINYINT(4) NULL DEFAULT NULL ,
+		`update_time` DATETIME NULL DEFAULT NULL,
+		`create_timestamp` BIGINT(20) NULL DEFAULT '0',
+		`update_timestamp` BIGINT(20) NULL DEFAULT '0',
+		`type` TINYINT(4) NULL DEFAULT '0' COMMENT '1:',
+		`create_time` DATETIME NULL DEFAULT NULL,
+		`create_user` VARCHAR(20) NULL DEFAULT NULL,
+		PRIMARY KEY (`id`)
+		)
+		COLLATE='utf8mb4_general_ci'
+		ENGINE=InnoDB
+		AUTO_INCREMENT=1 ;
+	</update>
+
+	<update id="createRules" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_learn_rules (
+		`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+		`name` VARCHAR(255) NULL DEFAULT NULL,
+		`category_id` INT(11) NULL DEFAULT NULL,
+		`relation` VARCHAR(255) NULL DEFAULT NULL,
+		`score` INT(11) NULL DEFAULT NULL,
+		`description` VARCHAR(255) NULL DEFAULT NULL,
+		`conditions` VARCHAR(5120) NULL DEFAULT NULL,
+		`raw_conditions` VARCHAR(5120) NULL DEFAULT NULL,
+		`use_type` INT(11) NULL DEFAULT NULL,
+		`rule_type` INT(11) NULL DEFAULT NULL,
+		`status` TINYINT(4) NULL DEFAULT NULL,
+		`create_user` VARCHAR(40) NULL DEFAULT NULL,
+		`create_time` DATETIME NULL DEFAULT NULL,
+		`create_timestamp` BIGINT(20) NULL DEFAULT '0',
+		`update_time` DATETIME NULL DEFAULT NULL,
+		`update_timestamp` BIGINT(20) NULL DEFAULT '0',
+		PRIMARY KEY (`id`)
+		)
+		COLLATE='utf8mb4_general_ci'
+		ENGINE=InnoDB
+		AUTO_INCREMENT=1 ;
+	</update>
+
+
+	<update id="createTaskInfoHistory" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_task_info_history (
+		`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+		`task_id` BIGINT(20) NULL DEFAULT NULL,
+		`session_id` VARCHAR(128) NULL DEFAULT NULL ,
+		`question_id` BIGINT(255) NULL DEFAULT NULL,
+		`task_type` TINYINT(4) NULL DEFAULT NULL ,
+		`mode` TINYINT(4) NULL DEFAULT '1' COMMENT '1练习，2考试',
+		`service_id` VARCHAR(255) NULL DEFAULT NULL ,
+		`service_name` VARCHAR(255) NULL DEFAULT NULL,
+		`score` INT(255) NULL DEFAULT NULL ,
+		`status` TINYINT(4) NULL DEFAULT NULL,
+		`end_type` TINYINT(4) NULL DEFAULT '1' ,
+		`start_time` DATETIME NULL DEFAULT NULL ,
+		`remain_time` BIGINT(20) NULL DEFAULT NULL,
+		`end_time` DATETIME NULL DEFAULT NULL ,
+		`create_time` DATETIME NULL DEFAULT NULL,
+		`update_time` DATETIME NULL DEFAULT NULL,
+		`delete_status` TINYINT(4) NULL DEFAULT '0' ,
+		`question_name` VARCHAR(300) NULL DEFAULT NULL,
+		`voice_auth_result` TINYINT(4) NULL DEFAULT '1' ,
+		`voice_auth_score` FLOAT NOT NULL DEFAULT '0',
+		`voice_auth_msg` VARCHAR(50) NOT NULL DEFAULT '',
+		PRIMARY KEY (`id`)
+		)
+		COLLATE='utf8mb4_general_ci'
+		ENGINE=InnoDB
+		ROW_FORMAT=DYNAMIC
+		AUTO_INCREMENT=1;
+	</update>
+
+	<update id="createTaskScoreHistory" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_task_score_history (
+		`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+		`task_id` BIGINT(20) NULL DEFAULT NULL ,
+		`score_type` TINYINT(4) NULL DEFAULT NULL ,
+		`question_name` VARCHAR(255) NULL DEFAULT NULL,
+		`process_retry_len` INT(11) NULL DEFAULT NULL,
+		`node_id` BIGINT(20) NULL DEFAULT NULL ,
+		`node_name` VARCHAR(255) NULL DEFAULT NULL ,
+		`rule_id` BIGINT(20) NULL DEFAULT NULL ,
+		`rule_name` VARCHAR(255) NULL DEFAULT NULL ,
+		`score` INT(11) NULL DEFAULT NULL ,
+		`chat_id` VARCHAR(255) NULL DEFAULT NULL ,
+		`create_time` DATETIME NULL DEFAULT NULL,
+		`violation_status` TINYINT(4) NULL DEFAULT NULL ,
+		`description` VARCHAR(300) NULL DEFAULT NULL,
+		`delete_status` TINYINT(2) NOT NULL DEFAULT '0' COMMENT '0:未删除； 1：删除',
+		PRIMARY KEY (`id`)
+		)
+		COLLATE='utf8mb4_general_ci'
+		ENGINE=InnoDB
+		ROW_FORMAT=DYNAMIC
+		AUTO_INCREMENT=1;
+	</update>
+
+	<update id="createEasyQuestion" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_easy_question (
+		`easy_question_id` int(11) NOT NULL,
+		`custom_script` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '自定义话术',
+		`deduction` tinyint(4) NULL DEFAULT NULL COMMENT '扣分的数额',
+		`question_rule_id` int(11) NULL DEFAULT NULL,
+		`semantic_tag_id` int(11) NULL DEFAULT NULL COMMENT '语义标签Id',
+		`script_type` tinyint(4) NOT NULL COMMENT '0语义标签，1自定义话术',
+		PRIMARY KEY (`easy_question_id`) USING BTREE,
+
+		INDEX `question_rule_id`(`question_rule_id`) USING BTREE,
+		CONSTRAINT `t_easy_question_ibfk_3` FOREIGN KEY (`question_rule_id`) REFERENCES `t_question_rule` (`question_rule_id`) ON DELETE SET NULL ON UPDATE SET NULL,
+		CONSTRAINT `t_easy_question_ibfk_4` FOREIGN KEY (`easy_question_id`) REFERENCES `t_base_question` (`base_question_id`) ON DELETE CASCADE ON UPDATE CASCADE
+		) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+    </update>
+
+	<update id="createExam" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_exam  (
+	   `exam_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+	   `total_score` int(11) NOT NULL,
+	   `time_cost` int(11) NOT NULL COMMENT '以秒为单位',
+	   `paper_id` int(11) NOT NULL,
+	   `update_time` datetime(0) NOT NULL,
+	   `create_time` datetime(0) NOT NULL,
+	   PRIMARY KEY (`exam_id`) USING BTREE,
+	   KEY `paper_id` (`paper_id`) USING BTREE,
+	   CONSTRAINT `t_exam_ibfk_1` FOREIGN KEY (`paper_id`) REFERENCES `t_paper` (`paper_id`) ON DELETE CASCADE ON UPDATE CASCADE
+		) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<update id="createExamPart" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_exam_part  (
+			`exam_part_id` int(11) NOT NULL AUTO_INCREMENT,
+			`exam_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+			`position` tinyint(4) NOT NULL COMMENT '第几部分',
+			`total_score` tinyint(4) NOT NULL COMMENT '总分数',
+			`actual_score` tinyint(4) NOT NULL COMMENT '实际得分',
+			PRIMARY KEY (`exam_part_id`) USING BTREE,
+			INDEX `exam_id`(`exam_id`) USING BTREE,
+			CONSTRAINT `t_exam_part_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `t_exam` (`exam_id`) ON DELETE CASCADE ON UPDATE CASCADE
+		) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<update id="createExamPartQuestion" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_exam_part_question  (
+			 `exam_part_question_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '                   ',
+			 `exam_part_id` int(11) NOT NULL,
+			 `base_question_id` int(11) NOT NULL,
+			 `type` tinyint(2) NULL DEFAULT NULL COMMENT '0问答题，1情景题',
+			 `audio_src` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '音频文件的地址',
+			 `score` tinyint(4) NULL DEFAULT NULL COMMENT '问答题的总分数',
+			 `end_type` tinyint(2) NULL DEFAULT NULL COMMENT '0坐席挂断；1客户挂断',
+			 PRIMARY KEY (`exam_part_question_id`) USING BTREE,
+			 INDEX `exam_part_id`(`exam_part_id`) USING BTREE,
+			 INDEX `t_exam_part_question_ibfk_1`(`base_question_id`) USING BTREE,
+			 CONSTRAINT `t_exam_part_question_ibfk_1` FOREIGN KEY (`base_question_id`) REFERENCES `t_base_question` (`base_question_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+			 CONSTRAINT `t_exam_part_question_ibfk_2` FOREIGN KEY (`exam_part_id`) REFERENCES `t_exam_part` (`exam_part_id`) ON DELETE CASCADE ON UPDATE CASCADE
+		) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+
+	<update id="createPaper" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_paper (
+		  `paper_id` int(11) NOT NULL AUTO_INCREMENT,
+		  `paper_name` varchar(255) CHARACTER SET utf8 NOT NULL,
+		  `level` tinyint(4) NOT NULL COMMENT '试卷难度；0高、1中、2低',
+		  `intro` varchar(512) NOT NULL COMMENT '试卷说明',
+		  `paper_category_id` int(11) DEFAULT NULL,
+		  `pass_score` tinyint(4) NOT NULL COMMENT '及格分数线',
+		  `time_limit` smallint(11) NOT NULL COMMENT '答题时间限制；单位，分钟',
+		  `type` tinyint(4) NOT NULL COMMENT '0只有问答题；1只有情景题；2两者都有',
+		  `update_time` datetime NOT NULL,
+		  `create_time` datetime NOT NULL,
+		  `need_reset` tinyint(2) NOT NULL DEFAULT '0' COMMENT '0试卷不需要调整；1试卷需要重新调整。',
+		  PRIMARY KEY (`paper_id`) USING BTREE,
+		  UNIQUE KEY `paper_name` (`paper_name`) USING BTREE,
+		  KEY `t_paper_ibfk_1` (`paper_category_id`) USING BTREE,
+		  CONSTRAINT `t_paper_ibfk_1` FOREIGN KEY (`paper_category_id`) REFERENCES `t_paper_category` (`paper_category_id`) ON DELETE SET NULL ON UPDATE CASCADE
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT
+	</update>
+
+	<update id="createPaperCategory" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_paper_category  (
+			`paper_category_id` int(11) NOT NULL AUTO_INCREMENT,
+			`paper_category_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+			`lft` int(11) NOT NULL,
+			`rgt` int(11) NOT NULL,
+			`can_operate` tinyint(2) NOT NULL DEFAULT 1 COMMENT '是否可以被操作',
+			PRIMARY KEY (`paper_category_id`) USING BTREE
+			) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<update id="createPaperPart" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_paper_part  (
+			`paper_part_id` int(11) NOT NULL AUTO_INCREMENT,
+			`position` tinyint(4) NOT NULL COMMENT '试卷的位置',
+			`paper_id` int(11) NOT NULL,
+			`is_in_order` tinyint(2) NOT NULL COMMENT '0不按照顺序；1按照顺序',
+			`is_random` tinyint(2) NOT NULL COMMENT '0不随机；1随机',
+			`score` tinyint(4) NOT NULL COMMENT '分数',
+			`part_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+			`type` tinyint(2) NOT NULL COMMENT '0问答题；1情景题',
+			`random_count` smallint(4) NULL DEFAULT NULL COMMENT '随机题数量',
+			PRIMARY KEY (`paper_part_id`) USING BTREE,
+			INDEX `paper_id`(`paper_id`) USING BTREE,
+			CONSTRAINT `t_paper_part_ibfk_1` FOREIGN KEY (`paper_id`) REFERENCES `t_paper` (`paper_id`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<update id="createPaperPartQuestion" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_part_question  (
+			`part_question_id` int(11) NOT NULL,
+			`paper_part_id` int(11) NOT NULL,
+			`is_required` tinyint(2)  NULL COMMENT '0不必须；1必须',
+			`score` tinyint(3)  NULL,
+			`process_rules` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NULL COMMENT '题目包含的会话流程',
+			`position` tinyint(4) NOT NULL COMMENT '题目的位置',
+			`need_reset` tinyint(2) NULL DEFAULT NULL COMMENT '试卷是否需要重新调整',
+			INDEX `paper_part_id`(`paper_part_id`) USING BTREE,
+			INDEX `part_question_id`(`part_question_id`) USING BTREE,
+			CONSTRAINT `t_part_question_ibfk_1` FOREIGN KEY (`paper_part_id`) REFERENCES `t_paper_part` (`paper_part_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+			CONSTRAINT `t_part_question_ibfk_2` FOREIGN KEY (`part_question_id`) REFERENCES `t_base_question` (`base_question_id`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<update id="createQuestionCategory" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_question_category  (
+			`question_category_id` int(11) NOT NULL AUTO_INCREMENT,
+			`question_category_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+			`lft` int(11) NOT NULL,
+			`rgt` int(11) NOT NULL,
+			`type` tinyint(2) NOT NULL COMMENT '0问答题分类，1简单题分类',
+			`can_operate` tinyint(2) NOT NULL DEFAULT 1 COMMENT '是否可以被操作',
+			PRIMARY KEY (`question_category_id`) USING BTREE
+			) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<update id="createQuestionRule" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_question_rule (
+		  `question_rule_id` int(11) NOT NULL AUTO_INCREMENT,
+		  `question_rule_name` varchar(255) NOT NULL,
+		  `score` int(11) DEFAULT NULL,
+		  `description` varchar(1024) NOT NULL,
+		  `question_rule_category_id` int(11) DEFAULT NULL,
+		  `update_time` datetime NOT NULL,
+		  `create_time` datetime NOT NULL,
+		  `relation` varchar(255) DEFAULT NULL,
+		  `conditions` varchar(5120) CHARACTER SET utf8mb4 DEFAULT NULL,
+		  `raw_conditions` varchar(5120) CHARACTER SET utf8mb4 DEFAULT NULL,
+		  `use_type` int(11) DEFAULT NULL,
+		  `status` tinyint(4) DEFAULT NULL,
+		  `create_user` varchar(40) CHARACTER SET utf8mb4 DEFAULT NULL,
+		  PRIMARY KEY (`question_rule_id`) USING BTREE,
+		  UNIQUE KEY `question_rule_name` (`question_rule_name`),
+		  KEY `question_rule_category_id` (`question_rule_category_id`) USING BTREE,
+		  CONSTRAINT `t_question_rule_ibfk_1` FOREIGN KEY (`question_rule_category_id`) REFERENCES `t_question_rule_category` (`question_rule_category_id`) ON DELETE SET NULL ON UPDATE CASCADE
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+	</update>
+
+
+	<update id="createQuestionRuleCategory" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_question_rule_category  (
+			`question_rule_category_id` int(11) NOT NULL AUTO_INCREMENT,
+			`lft` int(11) NOT NULL,
+			`rgt` int(11) NOT NULL,
+			`question_rule_category_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+			`can_operate` tinyint(2) NOT NULL DEFAULT 1 COMMENT '是否可以被编辑或者删除',
+			PRIMARY KEY (`question_rule_category_id`) USING BTREE
+			) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<update id="createSceneQuestion" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_scene_question (
+		  `scene_question_id` int(11) NOT NULL,
+		  `global_rules` varchar(255) DEFAULT NULL COMMENT '题目包含的全局规则',
+		  `process_rules` mediumtext NOT NULL COMMENT '题目包含的会话流程',
+		  `core_question` text NOT NULL,
+		  `scene_intro` text NOT NULL,
+		  `customer_info_title_group` varchar(2000) DEFAULT NULL,
+		  PRIMARY KEY (`scene_question_id`) USING BTREE,
+		  CONSTRAINT `t_scene_question_ibfk_1` FOREIGN KEY (`scene_question_id`) REFERENCES `t_base_question` (`base_question_id`) ON DELETE CASCADE ON UPDATE CASCADE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT
+	</update>
+
+	<update id="createSceneRule" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_scene_rule  (
+			`scene_rule_id` int(11) NOT NULL AUTO_INCREMENT,
+			`scene_rule_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+			`relation` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+			`score` tinyint(4) NULL DEFAULT NULL COMMENT '扣分',
+			`description` varchar(1024) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '评分说明',
+			`scene_rule_category_id` int(11) NULL DEFAULT NULL COMMENT '分类id',
+			`create_time` datetime(0) NOT NULL,
+			`update_time` datetime(0) NOT NULL,
+			`conditions` varchar(5120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`raw_conditions` varchar(5120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`use_type` int(11) NULL DEFAULT NULL,
+			`status` tinyint(4) NULL DEFAULT NULL,
+			`create_user` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`rule_type` tinyint(4) NULL DEFAULT NULL,
+			PRIMARY KEY (`scene_rule_id`) USING BTREE,
+			INDEX `scene_rule_category_id`(`scene_rule_category_id`) USING BTREE,
+			UNIQUE INDEX `scene_rule_name`(`scene_rule_name`) USING BTREE,
+			CONSTRAINT `t_scene_rule_ibfk_1` FOREIGN KEY (`scene_rule_category_id`) REFERENCES `t_scene_rule_category` (`scene_rule_category_id`) ON DELETE SET NULL ON UPDATE CASCADE
+			) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+	</update>
+
+
+	<update id="createSceneRuleCategory" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_scene_rule_category  (
+		`scene_rule_category_id` int(11) NOT NULL AUTO_INCREMENT,
+		`scene_rule_category_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+		`lft` int(11) NOT NULL,
+		`rgt` int(11) NOT NULL,
+		`can_operate` tinyint(2) NOT NULL DEFAULT 1 COMMENT '是否可以被删除、编辑',
+		PRIMARY KEY (`scene_rule_category_id`) USING BTREE
+		) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+	</update>
+
+
+
+	<update id="createScoreDetail" parameterType="java.util.Map">
+		CREATE TABLE IF NOT EXISTS ${dbName}.t_score_detail  (
+			`score_detail_id` int(11) NOT NULL AUTO_INCREMENT,
+			`rule_id` int(11) NOT NULL,
+			`is_violation` tinyint(2) NOT NULL,
+			`process_retry_len` smallint(4) NOT NULL,
+			`exam_part_question_id` int(11) NULL DEFAULT NULL,
+			`position` smallint(4) NOT NULL COMMENT '考试中，每道题目对应规则得分详情所在的位置。从0开始',
+			`rule_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`description` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`score` int(11) NULL DEFAULT NULL,
+			`score_type` tinyint(2) NULL DEFAULT NULL,
+			`node_id` bigint(20) NULL DEFAULT NULL,
+			`node_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			`chat_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+			PRIMARY KEY (`score_detail_id`) USING BTREE,
+			INDEX `scene_rule_id`(`rule_id`) USING BTREE,
+			INDEX `exam_part_question_id`(`exam_part_question_id`) USING BTREE,
+			CONSTRAINT `t_score_detail_ibfk_2` FOREIGN KEY (`exam_part_question_id`) REFERENCES `t_exam_part_question` (`exam_part_question_id`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+	</update>
+
+	<insert id="insertDataBusiness" parameterType="java.util.Map">
+		 insert ignore into t_learn_business(
+		 id,bus_id,db_name,start_time,company)
+		 values(
+		 #{busId,jdbcType=BIGINT},
+		 #{busId,jdbcType=BIGINT},
+		 #{dbName,jdbcType=VARCHAR},
+		 #{startTime,jdbcType=TIMESTAMP},
+		 #{company,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<update id="deleteBusinessDb" parameterType="java.util.Map">
+		update t_learn_business
+		<set>
+			 is_delete = 1
+		</set>
+		where bus_id = #{busId}
+	</update>
+
+
+	<insert id="createDefaultRule" parameterType="java.util.Map">
+
+		INSERT INTO ${dbName}.t_learn_rules (id, name, category_id, relation, score, description, conditions, raw_conditions, use_type, rule_type, status,
+		       create_user, create_time, create_timestamp, update_time, update_timestamp ) VALUES
+
+		(1,'语速过快',1,'(g1-ca)',10,'说话语速大于5个/秒时，判断为语速过快','[{\"name\":\"g1-ca\",\"relation\":\"fa\",\"messageType\":2,\"checkScope\":1,\"factors\":[{\"name\":\"fa\",\"checkType\":\"301\",\"checkValue\":\"10\"}]}]','[{\"conditionRelation\":\"all\",\"name\":\"\",\"relation\":\"||\",\"conditions\":[{\"checkScope\":1,\"messageType\":2,\"includeType\":1,\"relation\":\"<![CDATA[&&]]>\",\"factors\":[{\"checkType\":\"virtualType:301\",\"checkValue\":\"301::10\"}],\"factorValueList\":[{\"label\":\"语速过快\",\"value\":\"301::10\",\"data\":{}}]}]}]',0,3,0,NULL,#{createTime,jdbcType=TIMESTAMP},0,#{updateTime,jdbcType=TIMESTAMP},0),
+		(2,'抢话',1,'(g1-ca)',10,'抢话时间超过1.5s判定为抢话违规','[{\"name\":\"g1-ca\",\"relation\":\"fa\",\"messageType\":[2],\"checkScope\":1,\"factors\":[{\"name\":\"fa\",\"checkType\":\"302\",\"checkValue\":\"1\"}]}]','[{\"conditionRelation\":\"all\",\"name\":\"\",\"relation\":\"||\",\"conditions\":[{\"checkScope\":1,\"messageType\":2,\"includeType\":1,\"relation\":\"<![CDATA[&&]]>\",\"factors\":[{\"checkType\":\"virtualType:302\",\"checkValue\":\"302::1\",\"messageType\":[2]}],\"factorValueList\":[{\"label\":\"抢话\",\"value\":\"302::1\",\"data\":{\"messageType\":[2]}}]}]}]',0,3,#{wordStatus},NULL,#{createTime,jdbcType=TIMESTAMP},0,#{updateTime,jdbcType=TIMESTAMP},0),
+		(3,'敏感词',1,'(g1-ca)',10,'提及含有暴力/低俗等色彩的词语判定为敏感词违规','[{\"name\":\"g1-ca\",\"relation\":\"fa\",\"messageType\":2,\"checkScope\":1,\"factors\":[{\"name\":\"fa\",\"checkType\":2,\"checkValue\":\"投诉|曝光|举报|媒体|舆论|维权|骗子|记者|你妈的|妈的|有病|傻子|老赖|有毛病|我操|我去|卧槽|操|傻逼|智障|我去|去你大爷|你大爷|你奶奶的|尼玛的|你妈的|我日|有病吧|神经病|神经\"}]}]','[{\"conditionRelation\":\"all\",\"name\":\"\",\"relation\":\"||\",\"conditions\":[{\"checkScope\":1,\"messageType\":2,\"includeType\":1,\"relation\":\"<![CDATA[&&]]>\",\"factors\":[{\"checkType\":2,\"checkValue\":\"投诉|曝光|举报|媒体|舆论|维权|骗子|记者|你妈的|妈的|有病|傻子|老赖|有毛病|我操|我去|卧槽|操|傻逼|智障|我去|去你大爷|你大爷|你奶奶的|尼玛的|你妈的|我日|有病吧|神经病|神经\",\"checkTag\":\"\"}]}]}]',0,3,0,NULL,#{createTime,jdbcType=TIMESTAMP},0,#{updateTime,jdbcType=TIMESTAMP},0),
+		(4,'情绪异常',1,'(g1-ca)',10,'出现了带有负面情绪的话语','[{\"name\":\"g1-ca\",\"relation\":\"fa\",\"messageType\":2,\"checkScope\":1,\"factors\":[{\"name\":\"fa\",\"checkType\":\"312\",\"checkValue\":\"3\"}]}]','[{\"conditionRelation\":\"all\",\"name\":\"\",\"relation\":\"||\",\"conditions\":[{\"checkScope\":1,\"messageType\":2,\"includeType\":1,\"relation\":\"<![CDATA[&&]]>\",\"factors\":[{\"checkType\":\"virtualType:311-312\",\"checkValue\":\"312::3\"}],\"factorValueList\":[{\"label\":\"积极\",\"value\":\"311::1\",\"data\":{}},{\"label\":\"消极\",\"value\":\"312::3\",\"data\":{}}]}]}]',0,3,0,NULL,#{createTime,jdbcType=TIMESTAMP},0,#{updateTime,jdbcType=TIMESTAMP},0);
+	</insert>
+
+	<insert id="createDefaultGlobalRule" parameterType="java.util.Map">
+		INSERT INTO ${dbName}.t_scene_rule (scene_rule_id, scene_rule_name, scene_rule_category_id, relation, score, description, conditions, raw_conditions, use_type, rule_type, status,
+											 create_user, create_time, update_time ) VALUES
+		(1,'语速过快',5,'(g1-ca)',10,'说话语速大于5个/秒时，判断为语速过快','[{\"name\":\"g1-ca\",\"relation\":\"fa\",\"messageType\":2,\"checkScope\":1,\"factors\":[{\"name\":\"fa\",\"checkType\":\"301\",\"checkValue\":\"10\"}]}]','[{\"conditionRelation\":\"all\",\"name\":\"\",\"relation\":\"||\",\"conditions\":[{\"checkScope\":1,\"messageType\":2,\"includeType\":1,\"relation\":\"<![CDATA[&&]]>\",\"factors\":[{\"checkType\":\"virtualType:301\",\"checkValue\":\"301::10\"}],\"factorValueList\":[{\"label\":\"语速过快\",\"value\":\"301::10\",\"data\":{}}]}]}]',0,3,0,NULL,#{createTime,jdbcType=TIMESTAMP},#{updateTime,jdbcType=TIMESTAMP}),
+		(2,'敏感词',5,'(g1-ca)',10,'提及含有暴力/低俗等色彩的词语判定为敏感词违规','[{\"name\":\"g1-ca\",\"relation\":\"fa\",\"messageType\":2,\"checkScope\":1,\"factors\":[{\"name\":\"fa\",\"checkType\":2,\"checkValue\":\"投诉|曝光|举报|媒体|舆论|维权|骗子|记者|你妈的|妈的|有病|傻子|老赖|有毛病|我操|我去|卧槽|操|傻逼|智障|我去|去你大爷|你大爷|你奶奶的|尼玛的|你妈的|我日|有病吧|神经病|神经\"}]}]','[{\"conditionRelation\":\"all\",\"name\":\"\",\"relation\":\"||\",\"conditions\":[{\"checkScope\":1,\"messageType\":2,\"includeType\":1,\"relation\":\"<![CDATA[&&]]>\",\"factors\":[{\"checkType\":2,\"checkValue\":\"投诉|曝光|举报|媒体|舆论|维权|骗子|记者|你妈的|妈的|有病|傻子|老赖|有毛病|我操|我去|卧槽|操|傻逼|智障|我去|去你大爷|你大爷|你奶奶的|尼玛的|你妈的|我日|有病吧|神经病|神经\",\"checkTag\":\"\"}]}]}]',0,3,0,NULL,#{createTime,jdbcType=TIMESTAMP},#{updateTime,jdbcType=TIMESTAMP}),
+		(3,'情绪异常',5,'(g1-ca)',10,'出现了带有负面情绪的话语','[{\"name\":\"g1-ca\",\"relation\":\"fa\",\"messageType\":2,\"checkScope\":1,\"factors\":[{\"name\":\"fa\",\"checkType\":\"312\",\"checkValue\":\"3\"}]}]','[{\"conditionRelation\":\"all\",\"name\":\"\",\"relation\":\"||\",\"conditions\":[{\"checkScope\":1,\"messageType\":2,\"includeType\":1,\"relation\":\"<![CDATA[&&]]>\",\"factors\":[{\"checkType\":\"virtualType:311-312\",\"checkValue\":\"312::3\"}],\"factorValueList\":[{\"label\":\"积极\",\"value\":\"311::1\",\"data\":{}},{\"label\":\"消极\",\"value\":\"312::3\",\"data\":{}}]}]}]',0,3,0,NULL,#{createTime,jdbcType=TIMESTAMP},#{updateTime,jdbcType=TIMESTAMP});
+	</insert>
+
+	<insert id="createDefaultPaperCategory" parameterType="java.util.Map">
+		INSERT INTO ${dbName}.t_paper_category VALUES (1, '全部分类', 1, 4,0), (2, '未分类', 2, 3,0);
+	</insert>
+
+	<insert id="createDefaultQuestionCategory" parameterType="java.util.Map">
+		INSERT INTO ${dbName}.t_question_category VALUES (1, '全部分类', 1, 4, 0, 0), (2, '未分类', 2, 3, 0, 0), (3, '全部分类', 1, 4, 1, 0), (4, '未分类', 2, 3, 1, 0);
+	</insert>
+
+	<insert id="createDefaultQuestionRuleCategory" parameterType="java.util.Map">
+		INSERT INTO ${dbName}.t_question_rule_category VALUES (1, 1, 4, '全部分类', 0), (2, 2, 3, '未分类', 0);
+	</insert>
+
+	<insert id="createDefaultSceneRuleCategory" parameterType="java.util.Map">
+		INSERT INTO ${dbName}.t_scene_rule_category VALUES (1, '全部分类', 1, 12, 0), (2, '流程规则', 2, 5, 0), (3, '未分类', 3, 4, 0), (4, '全局规则', 6, 11, 0), (5, '默认', 7, 8, 0), (6, '未分类', 9, 10, 0);
+	</insert>
+
+
+
+
+
+
+
+	<insert id="createDefaultCategory" parameterType="java.util.Map">
+
+		INSERT INTO  ${dbName}.t_learn_category (id, name, category_level, parent_id, status, update_time, create_timestamp, update_timestamp,
+		   type, create_time, create_user) VALUES
+
+		(1,'默认规则',0,0,0,#{updateTime,jdbcType=TIMESTAMP},0,0,1,#{createTime,jdbcType=TIMESTAMP},NULL);
+	</insert>
+
+
+
+
+
+</mapper>

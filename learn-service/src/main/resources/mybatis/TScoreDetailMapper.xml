@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TScoreDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TScoreDetail">
+        <id column="score_detail_id" property="scoreDetailId" />
+        <result column="rule_id" property="ruleId" />
+        <result column="is_violation" property="isViolation" />
+        <result column="process_retry_len" property="processRetryLen" />
+        <result column="exam_part_question_id" property="examPartQuestionId" />
+        <result column="position" property="position" />
+        <result column="rule_name" property="ruleName" />
+        <result column="desc" property="desc" />
+        <result column="score" property="score" />
+        <result column="score_type" property="scoreType" />
+        <result column="node_id" property="nodeId" />
+        <result column="node_name" property="nodeName" />
+        <result column="chat_id" property="chatId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        score_detail_id, rule_id, is_violation, process_retry_len, exam_part_question_id, position, rule_name, desc, score, score_type, node_id, node_name, chat_id
+    </sql>
+
+</mapper>

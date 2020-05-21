@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.QuestionNodeMapper">
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.QuestionNode">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="question_id" jdbcType="BIGINT" property="questionId"/>
+        <result column="node_type" jdbcType="TINYINT" property="nodeType"/>
+        <result column="node_name" jdbcType="VARCHAR" property="nodeName"/>
+        <result column="sequence_no" jdbcType="INTEGER" property="sequenceNo"/>
+        <result column="scaft_type" jdbcType="TINYINT" property="scaftType"/>
+        <result column="is_interrupt" jdbcType="TINYINT" property="isInterrupt"/>
+        <result column="interrupt_time" jdbcType="INTEGER" property="interruptTime"/>
+        <result column="is_hangup" jdbcType="TINYINT" property="isHangup"/>
+        <result column="semantics_id" jdbcType="BIGINT" property="semanticsId"/>
+        <result column="custom_reply" jdbcType="BIGINT" property="customReply"/>
+        <result column="rule_id" jdbcType="BIGINT" property="ruleId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="delete_status" jdbcType="TINYINT" property="deleteStatus"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, question_id, node_type, node_name, sequence_no, scaft_type, is_interrupt, interrupt_time,
+        is_hangup, semantics_id, custom_reply, rule_id, create_time, update_time, delete_status
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_question_node
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <insert id="insert" parameterType="com.zhuiyi.ms.learn.entity.QuestionNode">
+        insert into t_question_node (id, question_id, node_type,
+            node_name, sequence_no, scaft_type,
+            is_interrupt, interrupt_time, is_hangup,
+            semantics_id, custom_reply, rule_id, create_time,
+            update_time, delete_status)
+        values (#{id,jdbcType=BIGINT}, #{questionId,jdbcType=BIGINT}, #{nodeType,jdbcType=TINYINT},
+        #{nodeName,jdbcType=VARCHAR}, #{sequenceNo,jdbcType=INTEGER}, #{scaftType,jdbcType=TINYINT},
+        #{isInterrupt,jdbcType=TINYINT}, #{interruptTime,jdbcType=INTEGER}, #{isHangup,jdbcType=TINYINT},
+        #{semanticsId,jdbcType=BIGINT}, #{customReply,jdbcType=VARCHAR}, #{ruleId,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP}, #{deleteStatus,jdbcType=TINYINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.zhuiyi.ms.learn.entity.QuestionNode">
+        insert into t_question_node
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="questionId != null">
+                question_id,
+            </if>
+            <if test="nodeType != null">
+                node_type,
+            </if>
+            <if test="nodeName != null">
+                node_name,
+            </if>
+            <if test="sequenceNo != null">
+                sequence_no,
+            </if>
+            <if test="scaftType != null">
+                scaft_type,
+            </if>
+            <if test="isInterrupt != null">
+                is_interrupt,
+            </if>
+            <if test="interruptTime != null">
+                interrupt_time,
+            </if>
+            <if test="isHangup != null">
+                is_hangup,
+            </if>
+            <if test="semanticsId != null">
+                semantics_id,
+            </if>
+            <if test="customReply != null">
+                custom_reply,
+            </if>
+            <if test="ruleId != null">
+                rule_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="deleteStatus != null">
+                delete_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="questionId != null">
+                #{questionId,jdbcType=BIGINT},
+            </if>
+            <if test="nodeType != null">
+                #{nodeType,jdbcType=TINYINT},
+            </if>
+            <if test="nodeName != null">
+                #{nodeName,jdbcType=VARCHAR},
+            </if>
+            <if test="sequenceNo != null">
+                #{sequenceNo,jdbcType=INTEGER},
+            </if>
+            <if test="scaftType != null">
+                #{scaftType,jdbcType=TINYINT},
+            </if>
+            <if test="isInterrupt != null">
+                #{isInterrupt,jdbcType=TINYINT},
+            </if>
+            <if test="interruptTime != null">
+                #{interruptTime,jdbcType=INTEGER},
+            </if>
+            <if test="isHangup != null">
+                #{isHangup,jdbcType=TINYINT},
+            </if>
+            <if test="semanticsId != null">
+                #{semanticsId,jdbcType=BIGINT},
+            </if>
+            <if test="customReply != null">
+                #{customReply,jdbcType=VARCHAR},
+            </if>
+            <if test="ruleId != null">
+                #{ruleId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhuiyi.ms.learn.entity.QuestionNode">
+        update t_question_node
+        <set>
+            <if test="questionId != null">
+                question_id = #{questionId,jdbcType=BIGINT},
+            </if>
+            <if test="nodeType != null">
+                node_type = #{nodeType,jdbcType=TINYINT},
+            </if>
+            <if test="nodeName != null">
+                node_name = #{nodeName,jdbcType=VARCHAR},
+            </if>
+            <if test="sequenceNo != null">
+                sequence_no = #{sequenceNo,jdbcType=INTEGER},
+            </if>
+            <if test="scaftType != null">
+                scaft_type = #{scaftType,jdbcType=TINYINT},
+            </if>
+            <if test="isInterrupt != null">
+                is_interrupt = #{isInterrupt,jdbcType=TINYINT},
+            </if>
+            <if test="interruptTime != null">
+                interrupt_time = #{interruptTime,jdbcType=INTEGER},
+            </if>
+            <if test="isHangup != null">
+                is_hangup = #{isHangup,jdbcType=TINYINT},
+            </if>
+            <if test="semanticsId != null">
+                semantics_id = #{semanticsId,jdbcType=BIGINT},
+            </if>
+            <if test="customReply != null">
+                custom_reply = #{customReply,jdbcType=VARCHAR},
+            </if>
+            <if test="ruleId != null">
+                rule_id = #{ruleId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteStatus != null">
+                delete_status = #{deleteStatus,jdbcType=TINYINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhuiyi.ms.learn.entity.QuestionNode">
+        UPDATE t_question_node
+        SET question_id    = #{questionId,jdbcType=BIGINT},
+            node_type      = #{nodeType,jdbcType=TINYINT},
+            node_name      = #{nodeName,jdbcType=VARCHAR},
+            sequence_no    = #{sequenceNo,jdbcType=INTEGER},
+            scaft_type     = #{scaftType,jdbcType=TINYINT},
+            is_interrupt   = #{isInterrupt,jdbcType=TINYINT},
+            interrupt_time = #{interruptTime,jdbcType=INTEGER},
+            is_hangup      = #{isHangup,jdbcType=TINYINT},
+            semantics_id   = #{semanticsId,jdbcType=BIGINT},
+            custom_reply   = #{customReply,jdbcType=VARCHAR},
+            rule_id        = #{ruleId,jdbcType=BIGINT},
+            create_time    = #{createTime,jdbcType=TIMESTAMP},
+            update_time    = #{updateTime,jdbcType=TIMESTAMP},
+            delete_status  = #{deleteStatus,jdbcType=TINYINT}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+        insert into t_question_node (question_id, node_type,
+        node_name, sequence_no, scaft_type,
+        is_interrupt, interrupt_time, is_hangup,
+        semantics_id, custom_reply, rule_id, create_time,
+        update_time, delete_status)
+        <foreach collection="list" open="values " separator="," item="item">
+            (#{item.questionId,jdbcType=BIGINT}, #{item.nodeType,jdbcType=TINYINT},
+            #{item.nodeName,jdbcType=VARCHAR}, #{item.sequenceNo,jdbcType=INTEGER}, #{item.scaftType,jdbcType=TINYINT},
+            #{item.isInterrupt,jdbcType=TINYINT}, #{item.interruptTime,jdbcType=INTEGER},
+            #{item.isHangup,jdbcType=TINYINT},
+            #{item.semanticsId,jdbcType=BIGINT}, #{item.customReply,jdbcType=VARCHAR}, #{item.ruleId,jdbcType=BIGINT},
+            #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateTime,jdbcType=TIMESTAMP}, #{item.deleteStatus,jdbcType=TINYINT})
+        </foreach>
+    </insert>
+    <delete id="deleteByQuestionId">
+        delete from t_question_node
+        where question_id = #{questionId}
+    </delete>
+</mapper>

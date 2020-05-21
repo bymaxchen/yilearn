@@ -1,0 +1,9 @@
+*/target/
+.classpath
+tmp/
+.settings/**
+.idea
+*.iml
+.project
+logs/**
+learn-service\src\main\resources\application-dev.yml

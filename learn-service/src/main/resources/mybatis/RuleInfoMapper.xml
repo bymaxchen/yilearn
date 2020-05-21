@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.RuleInfoMapper">
+
+	<insert id="saveRuleInfo" useGeneratedKeys="true" keyProperty="id"
+			parameterType="com.zhuiyi.ms.learn.dto.request.RequestRuleInfoDto">
+		INSERT INTO ${dbName}.t_learn_rules (
+		 name,category_id,relation,score,description,conditions,raw_conditions,use_type,rule_type,status,
+		 create_user,update_time,update_timestamp,create_time,create_timestamp
+		)
+		VALUES (
+		#{name,jdbcType=VARCHAR},
+		#{categoryId,jdbcType=INTEGER},
+		#{relation,jdbcType=VARCHAR},
+		#{score,jdbcType=INTEGER},
+		#{description,jdbcType=VARCHAR},
+		#{conditions,jdbcType=VARCHAR},
+		#{rawConditions,jdbcType=VARCHAR},
+		#{useType,jdbcType=INTEGER},
+		#{ruleType,jdbcType=INTEGER},
+		#{status,jdbcType=INTEGER},
+		#{createUser,jdbcType=VARCHAR},
+		#{updateTime,jdbcType=TIMESTAMP},
+		#{updateTimestamp,jdbcType=BIGINT},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{createTimestamp,jdbcType=BIGINT}
+		)
+	</insert>
+
+	<!--<insert id="createRuleAndSemantic" useGeneratedKeys="true" keyProperty="id" >-->
+		<!--INSERT INTO ${dbName}.t_learn_tag_rules (-->
+		<!--semantic_id,rule_id,category_id,status,create_time,create_timestamp,create_user-->
+		<!--)-->
+		<!--VALUES (-->
+		<!--#{semanticId,jdbcType=INTEGER},-->
+		<!--#{ruleId,jdbcType=INTEGER},-->
+		<!--#{categoryId,jdbcType=INTEGER},-->
+		<!--#{status,jdbcType=INTEGER},-->
+		<!--#{createTime,jdbcType=TIMESTAMP},-->
+		<!--#{createTimestamp,jdbcType=BIGINT},-->
+		<!--#{createUser,jdbcType=VARCHAR}-->
+		<!--)-->
+	<!--</insert>-->
+
+	<update id="deleteRuleInfo" parameterType="java.lang.Integer">
+		update ${dbName}.t_learn_rules a
+		set a.status = -1
+		where a.id = #{id}
+	</update>
+
+
+	<!--<delete id="deleteRuleAndSemanticByRuleId" parameterType="java.lang.Integer">-->
+		<!--delete from ${dbName}.t_learn_tag_rules-->
+		<!--where  rule_id = #{id}-->
+	<!--</delete>-->
+
+	<update id="updateRuleInfo" parameterType="java.lang.Integer">
+		update ${dbName}.t_learn_rules
+		<set>
+			<if test="name != null">name = #{name},</if>
+			<if test="categoryId != null">category_id = #{categoryId},</if>
+			<if test="relation != null">relation = #{relation},</if>
+			<if test="score != null">score = #{score},</if>
+			<if test="description != null">description = #{description},</if>
+			<if test="conditions != null">conditions = #{conditions},</if>
+			<if test="rawConditions != null">raw_conditions = #{rawConditions},</if>
+			<if test="useType != null">use_type = #{useType},</if>
+			<if test="updateTime != null">update_time = #{updateTime},</if>
+			<if test="updateTimestamp != null">update_timestamp = #{updateTimestamp}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<select id="getRules" resultType="com.zhuiyi.ms.learn.dto.response.ResponseRuleInfoDto">
+		select a.name as name,a.category_id as categoryId,a.relation as relation,a.score as score,
+		a.description as description,a.conditions as conditions,a.raw_conditions as rawConditions,a.use_type as useType,
+		a.rule_type as ruleType,a.status as status,a.create_user as createUser,a.create_time as createTimeDate,
+		a.create_timestamp as createTimestamp,a.update_time as updateTimeDate,a.update_timestamp as updateTimestamp,
+		a.id as Id
+		from ${dbName}.t_learn_rules a
+		where 1=1
+		<if test="ruleType != null and ruleType != 1">
+			and a.rule_type = #{ruleType}
+		</if>
+		<if test="ruleType != null and ruleType == 1">
+			and (a.rule_type = 1 or a.rule_type = 3)
+		</if>
+		<if test="ruleIds != null and ruleIds.size()>0">
+			and a.id in
+			<foreach item="id" collection="ruleIds" open="(" separator="," close=")">
+				#{id}
+			</foreach>
+		</if>
+		and a.status > -1
+		order by a.update_time desc
+		<if test="offset != null and limit != null">
+		limit #{offset}, #{limit}
+		</if>;
+	</select>
+
+	<select id="countRules" resultType="java.lang.Integer">
+		select count(1)
+		from ${dbName}.t_learn_rules a
+		where 1=1
+		<if test="ruleType != null and ruleType != 1">
+			and a.rule_type = #{ruleType}
+		</if>
+		<if test="ruleType != null and ruleType == 1">
+			and (a.rule_type = 1 or a.rule_type = 3)
+		</if>
+		<if test="ruleIds != null and ruleIds.size()>0">
+			and a.id in
+			<foreach item="id" collection="ruleIds" open="(" separator="," close=")">
+				#{id}
+			</foreach>
+		</if>
+	</select>
+
+	<select id="countExistRuleName" resultType="java.lang.Integer">
+		select count(1)
+		from ${dbName}.t_learn_rules a
+		where 1=1
+		<if test="ruleName != null">
+			and a.name = #{ruleName} and a.status > -1
+		</if>
+		<if test="ruleId != null">
+			and a.id  not in  (#{ruleId})
+		</if>
+
+	</select>
+
+	<select id="getInvolvedRulesBySemanticId" resultType="com.zhuiyi.ms.learn.dto.response.InvolvedRulesDto">
+		select a.id as ruleId, name as ruleName,a.rule_type as ruleType  from  ${dbName}.t_learn_rules a
+        <where>
+			<if test="semanticId != null">
+				and	 a.conditions REGEXP  CONCAT('"checkValue":','${semanticId}','[},]' )  and a.status > -1
+			</if>
+		</where>
+		group by a.id;
+	</select>
+
+	<select id="getReviewRules" resultType="com.zhuiyi.ms.learn.entity.RuleInfoEntity">
+		select a.name as name,a.category_id as categoryId,a.relation as relation,a.score as score,
+		a.description as description,a.conditions as conditions,a.raw_conditions as rawConditions,a.use_type as useType,
+		a.rule_type as ruleType, a.id as id
+		from ${dbName}.t_learn_rules a
+		where a.status > -1 ;
+	</select>
+
+</mapper>

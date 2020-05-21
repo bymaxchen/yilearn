@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TaskLogsInfoMapper">
+
+	<insert id="saveTaskInfo" useGeneratedKeys="true" keyProperty="id"
+			parameterType="com.zhuiyi.ms.learn.dto.request.TaskInfoDto">
+		INSERT INTO ${dbName}.t_task_info_history (
+		  question_id,task_type,session_id,service_id,service_name,score,status,start_time,end_time,delete_status,
+		  update_time,task_id,end_type,remain_time,question_name,mode
+		)
+		VALUES (
+		#{questionId,jdbcType=BIGINT},
+		#{taskType,jdbcType=TINYINT},
+		#{sessionId,jdbcType=VARCHAR},
+		#{serviceId,jdbcType=VARCHAR},
+		#{serviceName,jdbcType=VARCHAR},
+		#{score,jdbcType=INTEGER},
+		#{status,jdbcType=TINYINT},
+		#{startTime,jdbcType=DATE},
+		#{endTime,jdbcType=DATE},
+		#{deleteStatus,jdbcType=TINYINT},
+		#{updateTime,jdbcType=DATE},
+		#{taskId,jdbcType=BIGINT},
+		#{endType,jdbcType=TINYINT},
+		#{remainTime,jdbcType=BIGINT},
+		#{questionName,jdbcType=VARCHAR},
+		ifnull(#{mode,jdbcType=TINYINT},0)
+		)
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			SELECT LAST_INSERT_ID() as Id
+		</selectKey>
+	</insert>
+
+	<insert id="saveChatLog" useGeneratedKeys="true" keyProperty="id"
+			parameterType="com.zhuiyi.ms.learn.dto.request.TaskChatLogDto">
+		INSERT INTO ${dbName}.t_chat_log (
+		 task_id,session_id,chat_id,content,identity,service_id,service_name,create_time,start_timestamp,end_timestamp,
+		 group_id,is_violation
+		)
+		VALUES (
+		#{taskId,jdbcType=BIGINT},
+		#{sessionId,jdbcType=VARCHAR},
+		#{chatId,jdbcType=VARCHAR},
+		#{content,jdbcType=VARCHAR},
+		#{identity,jdbcType=TINYINT},
+		#{serviceId,jdbcType=VARCHAR},
+		#{serviceName,jdbcType=VARCHAR},
+		#{createTime,jdbcType=DATE},
+		#{startTimestamp,jdbcType=BIGINT},
+		#{endTimestamp,jdbcType=BIGINT},
+		#{groupId,jdbcType=BIGINT},
+		#{isViolation,jdbcType=TINYINT}
+		)
+	</insert>
+
+	<insert id="saveTaskScore" useGeneratedKeys="true" keyProperty="id"
+			parameterType="com.zhuiyi.ms.learn.dto.request.TaskScoreDto">
+		INSERT INTO ${dbName}.t_task_score_history (
+		 task_id,score_type,question_name,rule_id,rule_name,score,chat_id,violation_status,node_id,node_name,description
+		)
+		VALUES (
+		#{taskId,jdbcType=BIGINT},
+		#{scoreType,jdbcType=TINYINT},
+		#{questionName,jdbcType=VARCHAR},
+		#{ruleId,jdbcType=BIGINT},
+		#{ruleName,jdbcType=VARCHAR},
+		#{score,jdbcType=INTEGER},
+		#{chatId,jdbcType=VARCHAR},
+		#{violationStatus,jdbcType=BIGINT},
+		#{nodeId,jdbcType=VARCHAR},
+		#{nodeName,jdbcType=VARCHAR},
+		#{description,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<select id="getTaskInfos" resultType="com.zhuiyi.ms.learn.dto.response.ResponseTaskLogsDto">
+		select a.question_id as questionId,a.task_type as taskType,a.session_id as sessionId,a.service_id as serviceId,
+		a.service_name as serviceName,a.score as score,a.status as status,a.start_time as startTimeDate,a.task_id as taskId,
+		a.end_time as endTimeDate,a.delete_status as deleteStatus,a.id as id,a.end_type as endType,
+		a.remain_time as remainTime,a.question_name as questionName,a.voice_auth_result as voiceAuthResult,
+		a.voice_auth_score as voiceAuthScore, a.voice_auth_msg as voiceAuthMsg, a.mode as mode
+		from ${dbName}.t_task_info_history a
+		where a.delete_status = 0
+		<if test="taskId != null">
+			and	a.task_id = #{taskId}
+		</if>
+		<if test="taskType != null">
+			and	a.task_type = #{taskType}
+		</if>
+		<if test="sessionId != null">
+			and	a.session_id = #{sessionId}
+		</if>
+		<if test="userId != null">
+			and	a.service_id = #{userId}
+		</if>
+		<if test="startTime != null">
+			and	a.start_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			and	a.end_time <![CDATA[<=]]> #{endTime}
+		</if>
+		order by a.id asc
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+
+	</select>
+
+	<select id="getTaskLogs" resultType="com.zhuiyi.ms.learn.dto.response.TaskLogsDto">
+		select a.task_id as taskId,a.session_id as sessionId,a.chat_id as chatId,a.content as content,
+		a.identity as identity,a.service_id as service_id,a.service_name as service_name,a.create_time as createTimeDate,
+		a.start_timestamp as startTimestamp,a.end_timestamp as endTimestamp,a.group_id as groupId,
+		a.is_violation as isViolation
+		from ${dbName}.t_chat_log a
+		where a.delete_status = 0
+		<if test="id != null">
+			and	a.task_id = #{id}
+		</if>
+		<if test="sessionId != null">
+			and	a.session_id = #{sessionId}
+		</if>
+		<if test="sessionIds != null and sessionIds.size()>0">
+			and a.session_id in
+			<foreach item="sessionId" collection="sessionIds" open="(" separator="," close=")">
+				#{sessionId}
+			</foreach>
+		</if>
+		<if test="taskIds != null and taskIds.size()>0">
+			and a.task_id in
+			<foreach item="taskId" collection="taskIds" open="(" separator="," close=")">
+				#{taskId}
+			</foreach>
+		</if>
+		<if test="null != startTaskId">
+			and a.task_id <![CDATA[>=]]> #{startTaskId}
+		</if>
+		<if test="null != endTaskId">
+			and a.task_id <![CDATA[<=]]> #{endTaskId}
+		</if>
+	</select>
+
+	<select id="getTaskScore" resultType="com.zhuiyi.ms.learn.dto.response.ResponseTaskScoreDto">
+		select a.chat_id as chatId,a.score_type as scoreType,a.rule_id as ruleId,a.rule_name as ruleName,a.score as score,
+		a.violation_status as isViolation,a.node_id as nodeId,a.node_name as nodeName,a.description as description,
+		a.task_id as taskId, a.process_retry_len as processRetryLen
+		from ${dbName}.t_task_score_history a
+		where a.delete_status = 0
+		<if test="id != null">
+			and	a.task_id = #{id}
+		</if>
+		<if test="taskIds != null and taskIds.size()>0">
+			and a.task_id in
+			<foreach item="taskId" collection="taskIds" open="(" separator="," close=")">
+				#{taskId}
+			</foreach>
+		</if>
+	</select>
+
+	<select id="getCountViolationsByNode" resultType="com.zhuiyi.ms.learn.dto.response.ResponseTotalNodeDto">
+		select  count(1) as violationNums, a.node_id as nodeId,a.node_name as nodeName,b.start_time as createTime,
+		a.rule_id as ruleId,a.rule_name as ruleName
+		from ${dbName}.t_task_score_history a
+		inner join ${dbName}.t_task_info_history b on a.task_id = b.id and b.delete_status = 0
+		where 1=1
+		<if test="startTime != null">
+			and	b.start_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			and	b.end_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="scoreType != null">
+			and	a.score_type <![CDATA[=]]> #{scoreType}
+		</if>
+		<if test="violationStatus != null">
+			and	a.violation_status <![CDATA[=]]> #{violationStatus}
+		</if>
+		<if test="serviceIds != null and serviceIds.size()>0">
+			and b.service_id in
+			<foreach item="serviceId" collection="serviceIds" open="(" separator="," close=")">
+				#{serviceId}
+			</foreach>
+		</if>
+		group by a.node_name order by violationNums desc;
+	</select>
+
+	<select id="getCountViolationsByGlobal" resultType="com.zhuiyi.ms.learn.dto.response.ResponseTotalNodeDto">
+		select  count(1) as violationNums, a.node_id as nodeId,a.node_name as nodeName,b.start_time as createTime,
+		a.rule_id as ruleId,a.rule_name as ruleName
+		from ${dbName}.t_task_score_history a
+		inner join ${dbName}.t_task_info_history b on a.task_id = b.id and b.delete_status = 0
+		where 1=1
+		<if test="startTime != null">
+			and	b.start_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			and	b.end_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="scoreType != null">
+			and	a.score_type <![CDATA[=]]> #{scoreType}
+		</if>
+		<if test="violationStatus != null">
+			and	a.violation_status <![CDATA[=]]> #{violationStatus}
+		</if>
+		<if test="serviceIds != null and serviceIds.size()>0">
+			and b.service_id in
+			<foreach item="serviceId" collection="serviceIds" open="(" separator="," close=")">
+				#{serviceId}
+			</foreach>
+		</if>
+		group by a.rule_id order by violationNums desc;
+	</select>
+
+	<select id="getServiceTotalScoreDto" resultType="com.zhuiyi.ms.learn.dto.response.ResponseServiceScoreDto">
+		select a.service_id as serviceId,a.service_name as serviceName,count(1) as trainTimes,a.task_id as taskId,
+		round(AVG(a.score),2)  as averageScore from ${dbName}.t_task_info_history a
+		where a.delete_status = 0
+		<if test="taskType != null">
+			and	a.task_type = #{taskType}
+		</if>
+		<if test="startTime != null">
+			and	a.start_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null">
+			and	a.end_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="query != null">
+			and	 (a.service_id like CONCAT('%','${query}','%' ) or a.service_name like CONCAT('%','${query}','%' ))
+		</if>
+		<if test="serviceIds != null and serviceIds.size()>0">
+			and a.service_id in
+			<foreach item="serviceId" collection="serviceIds" open="(" separator="," close=")">
+				#{serviceId}
+			</foreach>
+		</if>
+		group by a.service_id
+		<if test="orderBy ==0">
+			order by a.service_name ASC
+		</if>
+		<if test="orderBy ==1">
+			order by a.service_name DESC
+		</if>
+		<if test="orderBy ==10">
+            order by trainTimes ASC
+		</if>
+		<if test="orderBy ==11">
+			order by trainTimes DESC
+		</if>
+		<if test="orderBy ==40">
+			order by averageScore ASC
+		</if>
+		<if test="orderBy ==41">
+			order by averageScore DESC
+		</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>;
+	</select>
+
+
+	<select id="getTotalServiceScore" resultType="java.lang.Integer">
+		select count(1) from (
+		select count(1) from ${dbName}.t_task_info_history a
+        where a.delete_status = 0
+			<if test="taskType != null">
+				and	a.task_type = #{taskType}
+			</if>
+            <if test="serviceIds != null and serviceIds.size()>0">
+                and a.service_id in
+                <foreach item="serviceId" collection="serviceIds" open="(" separator="," close=")">
+                    #{serviceId}
+                </foreach>
+            </if>
+            <if test="query != null">
+                and	 (a.service_id like CONCAT('%','${query}','%' ) or a.service_name like CONCAT('%','${query}','%' ))
+            </if>
+			<if test="startTime != null">
+				and	a.start_time <![CDATA[>=]]> #{startTime}
+			</if>
+			<if test="endTime != null">
+				and	a.end_time <![CDATA[<=]]> #{endTime}
+			</if>
+			group by a.service_id ) a;
+	</select>
+
+	<select id="getProcessScoreByType" resultType="java.lang.Integer">
+		select  count(1) as processViolationScore
+		from ${dbName}.t_task_score_history a
+		where a.delete_status = 0 and a.violation_status = 2
+		<if test="scoreType != null">
+			and	a.score_type = #{scoreType}
+		</if>
+		<if test="id != null">
+			and	a.task_id = #{id}
+		</if>
+	</select>
+
+	<select id="getViolationTimesByTaskIdList" resultType="com.zhuiyi.ms.learn.entity.bo.ViolationTimesBO">
+		select  a.task_id as id, count(1) as violationTimes
+		from ${dbName}.t_task_score_history a
+		where a.delete_status = 0 and a.violation_status = 2
+		<if test="scoreType != null">
+			and	a.score_type = #{scoreType}
+		</if>
+		<if test="taskIdList != null and taskIdList.size()>0">
+			and a.task_id in
+			<foreach item="taskId" collection="taskIdList" open="(" separator="," close=")">
+				#{taskId}
+			</foreach>
+		</if>
+		group BY a.task_id
+	</select>
+
+	<select id="getGlobalScoreByType" resultType="java.lang.Integer">
+		select  count(1) as globalViolationScore
+		from ${dbName}.t_task_score_history a
+		where a.delete_status = 0 and a.violation_status = 2
+		<if test="scoreType != null">
+			and	a.score_type = #{scoreType}
+		</if>
+		<if test="id != null">
+			and	a.task_id = #{id}
+		</if>
+	</select>
+
+	<select id="getAllService" resultType="com.zhuiyi.ms.learn.dto.response.ResponseServiceDto">
+		select a.service_id as serviceId,a.service_name as serviceName
+		from ${dbName}.t_task_info_history a
+		where a.delete_status = 0
+		group by a.service_id  ;
+	</select>
+
+	<select id="getTaskIdAndService" resultType="com.zhuiyi.ms.learn.dto.response.TotalTaskInfoDto">
+		select a.task_id as taskId,a.service_id as serviceId,a.service_name as serviceName,a.id as Id
+		from ${dbName}.t_task_info_history a
+		where a.delete_status =0
+			<if test="taskType != null">
+				and	a.task_type = #{taskType}
+			</if>
+            <if test="query != null and query != ''">
+                and	a.service_id  = #{query}
+            </if>
+			<if test="serviceIds != null and serviceIds.size()>0">
+				and a.service_id in
+				<foreach item="serviceId" collection="serviceIds" open="(" separator="," close=")">
+					#{serviceId}
+				</foreach>
+			</if>
+            <if test="startTime != null">
+                and	a.start_time <![CDATA[>=]]> #{startTime}
+            </if>
+            <if test="endTime != null">
+                and	a.end_time <![CDATA[<=]]> #{endTime}
+            </if>
+	</select>
+
+
+	<update id="deleteTaskLogBySessionId" parameterType="java.lang.String">
+		update ${dbName}.t_task_info_history a
+		set a.delete_status = 1
+		where a.session_id = #{sessionId}
+	</update>
+
+
+	<select id="getTaskBelongId" resultType="java.lang.Integer">
+		select a.id from ${dbName}.t_task_info_history a
+		where a.delete_status = 0
+		<if test="taskId != null">
+			and	a.task_id = #{taskId}
+		</if>
+	</select>
+
+	<update id="deleteChatLogById" parameterType="java.lang.String">
+		update ${dbName}.t_chat_log a
+		set a.delete_status = 1
+		<where>
+			<if test="taskId != null">
+				a.task_id = #{taskId}
+			</if>
+		</where>
+	</update>
+
+	<update id="deleteTaskScore" parameterType="java.lang.String">
+		update ${dbName}.t_task_score_history a
+		set a.delete_status = 1
+		<where>
+			<if test="taskId != null">
+				a.task_id = #{taskId}
+			</if>
+		</where>
+	</update>
+
+	<update id="updateSessionInfo" parameterType="java.lang.String">
+		update ${dbName}.t_task_info_history
+		<set>
+			<if test="taskId != null">task_id = #{taskId},</if>
+			<if test="sessionId != null">session_id = #{sessionId},</if>
+			<if test="questionId != null">question_id = #{questionId},</if>
+			<if test="taskType != null">task_type = #{taskType},</if>
+			<if test="serviceId != null">service_id = #{serviceId},</if>
+			<if test="score != null">score = #{score},</if>
+			<if test="serviceName != null">service_name = #{serviceName},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="endType != null">end_type = #{endType},</if>
+			<if test="startTime != null">start_time = #{startTime},</if>
+			<if test="remainTime != null">remain_time = #{remainTime},</if>
+			<if test="endTime != null">end_time = #{endTime},</if>
+			<if test="updateTime != null">update_time = #{updateTime},</if>
+			<if test="questionName != null">question_name = #{questionName},</if>
+			<if test="voiceAuthResult != null">voice_auth_result = #{voiceAuthResult},</if>
+			<if test="voiceAuthScore != null">voice_auth_score = #{voiceAuthScore}</if>
+		</set>
+		where session_id = #{sessionId}
+	</update>
+
+	<insert id="batchInsertChatLog" parameterType="java.util.Map">
+		INSERT INTO ${dbName}.t_chat_log (
+		task_id,session_id,chat_id,content,identity,service_id,service_name,create_time,start_timestamp,end_timestamp,
+		group_id,is_violation
+		)  values
+		<foreach collection="chatLogList" item="chatLog" index="index" separator=",">
+			(
+			#{chatLog.taskId,jdbcType=BIGINT},
+			#{chatLog.sessionId,jdbcType=VARCHAR},
+			#{chatLog.chatId,jdbcType=VARCHAR},
+			#{chatLog.content,jdbcType=VARCHAR},
+			#{chatLog.identity,jdbcType=TINYINT},
+			#{chatLog.serviceId,jdbcType=VARCHAR},
+			#{chatLog.serviceName,jdbcType=VARCHAR},
+			#{chatLog.createTime,jdbcType=DATE},
+			#{chatLog.startTimestamp,jdbcType=BIGINT},
+			#{chatLog.endTimestamp,jdbcType=BIGINT},
+			#{chatLog.groupId,jdbcType=BIGINT},
+			#{chatLog.isViolation,jdbcType=TINYINT}
+			)
+		</foreach>
+	</insert>
+
+	<insert id="batchInsertTaskScore" parameterType="java.util.Map">
+		INSERT INTO ${dbName}.t_task_score_history (
+		task_id,score_type,question_name,rule_id,rule_name,score,chat_id,violation_status,
+		node_id,node_name,description,process_retry_len
+		) values
+		<foreach collection="taskScoreList" item="taskScore" index="index" separator=",">
+			(
+			#{taskScore.taskId,jdbcType=BIGINT},
+			#{taskScore.scoreType,jdbcType=TINYINT},
+			#{taskScore.questionName,jdbcType=VARCHAR},
+			#{taskScore.ruleId,jdbcType=BIGINT},
+			#{taskScore.ruleName,jdbcType=VARCHAR},
+			#{taskScore.score,jdbcType=INTEGER},
+			#{taskScore.chatId,jdbcType=VARCHAR},
+			#{taskScore.violationStatus,jdbcType=BIGINT},
+			#{taskScore.nodeId,jdbcType=VARCHAR},
+			#{taskScore.nodeName,jdbcType=VARCHAR},
+			#{taskScore.description,jdbcType=VARCHAR},
+			#{taskScore.processRetryLen,jdbcType=BIGINT}
+			)
+		</foreach>
+	</insert>
+
+	<select id="countTaskInfoHistory" resultType="java.lang.Integer">
+		select count(*) from ${dbName}.t_task_info_history ;
+	</select>
+
+
+
+</mapper>

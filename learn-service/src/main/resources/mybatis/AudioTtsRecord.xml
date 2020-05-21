@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.AudioTtsMapper">
+
+	<insert id="replaceAudioTts"   parameterType="com.zhuiyi.ms.learn.entity.AudioTtsEntity">
+		REPLACE INTO t_audio_record (
+		text_id,audio_file_path,start_time,text
+		)
+		VALUES (
+		#{textId,jdbcType=VARCHAR},
+		#{audioFilePath,jdbcType=VARCHAR},
+		#{startTime,jdbcType=TIMESTAMP},
+		#{text,jdbcType=VARCHAR}
+		)
+	</insert>
+
+
+	<select id="getAudioTts" parameterType="java.util.Map" resultType="com.zhuiyi.ms.learn.entity.AudioTtsEntity">
+		select  a.id as id, a.text_id as textId, a.audio_file_path as audioFilePath
+		from t_audio_record a
+		where a.text_id = #{textId};
+	</select>
+
+
+	<select id="getAudioTtsByTextId" parameterType="java.util.Map" resultType="com.zhuiyi.ms.learn.entity.AudioTtsEntity">
+		select  a.id as id, a.text_id as textId, a.audio_file_path as audioFilePath, a.text as text
+		from t_audio_record a
+		where a.text_id = #{textId};
+	</select>
+
+	<!--<delete id="deleteRecord" parameterType="java.lang.Integer">-->
+		<!--delete  from t_guanghua_record   where  id = #{id};-->
+	<!--</delete>-->
+
+	<update id="updateAudioTts" parameterType="java.util.Map">
+		update t_audio_record
+		<set>
+			<if test="audioFilePath != null">audio_file_path = #{audioFilePath},</if>
+			<if test="start_time != null">start_time = #{startTime}</if>
+		</set>
+		where  text_id = #{textId}
+	</update>
+
+	<insert id="saveExamAndTts" useGeneratedKeys="true" keyProperty="id"
+			parameterType="java.util.Map">
+		REPLACE INTO t_exam_tts (
+		start_time,exam_id,text_id,text
+		)
+		VALUES (
+		#{startTime,jdbcType=TIMESTAMP},
+		#{examId,jdbcType=INTEGER},
+		#{textId,jdbcType=VARCHAR},
+		#{text,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<update id="deleteExamAndTts" parameterType="java.util.Map">
+		update t_exam_tts a  set a.is_delete = 1
+		<where>
+			<if test="examId != null">
+				a.exam_id = #{examId}
+			</if>
+			<if test="textIds != null and textIds.size() > 0">
+				and a.text_id in
+				<foreach item="textId" collection="textIds" open="(" separator="," close=")">
+					#{textId}
+				</foreach>
+			</if>
+		</where>
+	</update>
+
+
+	<select id="getNoUseTts"   resultType="java.lang.String">
+		select a.text_id as text_id from t_exam_tts a where is_delete = 1  and  text_id not in (
+		select  text_id as text_id from t_exam_tts  where is_delete = 0
+		) group by text_id;
+	</select>
+
+	<select id="getTtsPath"   resultType="java.lang.String">
+		select  a.audio_file_path from t_audio_record a
+		where
+		<if test="textIds != null">
+			 a.text_id in
+			<foreach item="textId" collection="textIds" open="(" separator="," close=")">
+				#{textId}
+			</foreach>
+		</if>
+
+	</select>
+
+	<select id="listTts" resultType="com.zhuiyi.ms.learn.entity.AudioTtsEntity">
+		select  a.id as id, a.text_id as textId, a.text as text, a.audio_file_path as audioFilePath
+		from t_audio_record a;
+	</select>
+
+</mapper>

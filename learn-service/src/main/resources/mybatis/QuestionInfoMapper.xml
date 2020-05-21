@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.QuestionInfoMapper">
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.QuestionInfo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="question_name" jdbcType="VARCHAR" property="questionName"/>
+        <result column="question_classify_id" jdbcType="BIGINT" property="questionClassifyId"/>
+        <result column="question_grade" jdbcType="TINYINT" property="questionGrade"/>
+        <result column="global_rule_id" jdbcType="BIGINT" property="globalRuleId"/>
+        <result column="is_force_order" jdbcType="TINYINT" property="isForceOrder"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="customer_gender" jdbcType="TINYINT" property="customerGender"/>
+        <result column="customer_bank_card" jdbcType="VARCHAR" property="customerBankCard"/>
+        <result column="customer_arrears" jdbcType="BIGINT" property="customerArrears"/>
+        <result column="customer_min_repayment" jdbcType="BIGINT" property="customerMinRepayment"/>
+        <result column="customer_overdue" jdbcType="INTEGER" property="customerOverdue"/>
+        <result column="customer_delay_stage" jdbcType="VARCHAR" property="customerDelayStage"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="delete_status" jdbcType="TINYINT" property="deleteStatus"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, question_name, question_classify_id, question_grade, global_rule_id, is_force_order, 
+    customer_name, customer_gender, customer_bank_card, customer_arrears, customer_min_repayment, 
+    customer_overdue, customer_delay_stage, create_time, update_time, delete_status
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_question_info
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <insert id="insert" parameterType="com.zhuiyi.ms.learn.entity.QuestionInfo">
+    insert into t_question_info (id, question_name, question_classify_id, 
+      question_grade, global_rule_id, is_force_order, 
+      customer_name, customer_gender, customer_bank_card, 
+      customer_arrears, customer_min_repayment, customer_overdue, 
+      customer_delay_stage, create_time, update_time, 
+      delete_status)
+    values (#{id,jdbcType=BIGINT}, #{questionName,jdbcType=VARCHAR}, #{questionClassifyId,jdbcType=BIGINT}, 
+      #{questionGrade,jdbcType=TINYINT}, #{globalRuleId,jdbcType=BIGINT}, #{isForceOrder,jdbcType=TINYINT}, 
+      #{customerName,jdbcType=VARCHAR}, #{customerGender,jdbcType=TINYINT}, #{customerBankCard,jdbcType=VARCHAR}, 
+      #{customerArrears,jdbcType=BIGINT}, #{customerMinRepayment,jdbcType=BIGINT}, #{customerOverdue,jdbcType=INTEGER}, 
+      #{customerDelayStage,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{deleteStatus,jdbcType=TINYINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.zhuiyi.ms.learn.entity.QuestionInfo" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into t_question_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="questionName != null">
+                question_name,
+            </if>
+            <if test="questionClassifyId != null">
+                question_classify_id,
+            </if>
+            <if test="questionGrade != null">
+                question_grade,
+            </if>
+            <if test="globalRuleId != null">
+                global_rule_id,
+            </if>
+            <if test="isForceOrder != null">
+                is_force_order,
+            </if>
+            <if test="customerName != null">
+                customer_name,
+            </if>
+            <if test="customerGender != null">
+                customer_gender,
+            </if>
+            <if test="customerBankCard != null">
+                customer_bank_card,
+            </if>
+            <if test="customerArrears != null">
+                customer_arrears,
+            </if>
+            <if test="customerMinRepayment != null">
+                customer_min_repayment,
+            </if>
+            <if test="customerOverdue != null">
+                customer_overdue,
+            </if>
+            <if test="customerDelayStage != null">
+                customer_delay_stage,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="deleteStatus != null">
+                delete_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="questionName != null">
+                #{questionName,jdbcType=VARCHAR},
+            </if>
+            <if test="questionClassifyId != null">
+                #{questionClassifyId,jdbcType=BIGINT},
+            </if>
+            <if test="questionGrade != null">
+                #{questionGrade,jdbcType=TINYINT},
+            </if>
+            <if test="globalRuleId != null">
+                #{globalRuleId,jdbcType=BIGINT},
+            </if>
+            <if test="isForceOrder != null">
+                #{isForceOrder,jdbcType=TINYINT},
+            </if>
+            <if test="customerName != null">
+                #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="customerGender != null">
+                #{customerGender,jdbcType=TINYINT},
+            </if>
+            <if test="customerBankCard != null">
+                #{customerBankCard,jdbcType=VARCHAR},
+            </if>
+            <if test="customerArrears != null">
+                #{customerArrears,jdbcType=BIGINT},
+            </if>
+            <if test="customerMinRepayment != null">
+                #{customerMinRepayment,jdbcType=BIGINT},
+            </if>
+            <if test="customerOverdue != null">
+                #{customerOverdue,jdbcType=INTEGER},
+            </if>
+            <if test="customerDelayStage != null">
+                #{customerDelayStage,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhuiyi.ms.learn.entity.QuestionInfo">
+        update t_question_info
+        <set>
+            <if test="questionName != null">
+                question_name = #{questionName,jdbcType=VARCHAR},
+            </if>
+            <if test="questionClassifyId != null">
+                question_classify_id = #{questionClassifyId,jdbcType=BIGINT},
+            </if>
+            <if test="questionGrade != null">
+                question_grade = #{questionGrade,jdbcType=TINYINT},
+            </if>
+            <if test="globalRuleId != null">
+                global_rule_id = #{globalRuleId,jdbcType=BIGINT},
+            </if>
+            <if test="isForceOrder != null">
+                is_force_order = #{isForceOrder,jdbcType=TINYINT},
+            </if>
+            <if test="customerName != null">
+                customer_name = #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="customerGender != null">
+                customer_gender = #{customerGender,jdbcType=TINYINT},
+            </if>
+            <if test="customerBankCard != null">
+                customer_bank_card = #{customerBankCard,jdbcType=VARCHAR},
+            </if>
+            <if test="customerArrears != null">
+                customer_arrears = #{customerArrears,jdbcType=BIGINT},
+            </if>
+            <if test="customerMinRepayment != null">
+                customer_min_repayment = #{customerMinRepayment,jdbcType=BIGINT},
+            </if>
+            <if test="customerOverdue != null">
+                customer_overdue = #{customerOverdue,jdbcType=INTEGER},
+            </if>
+            <if test="customerDelayStage != null">
+                customer_delay_stage = #{customerDelayStage,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteStatus != null">
+                delete_status = #{deleteStatus,jdbcType=TINYINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhuiyi.ms.learn.entity.QuestionInfo">
+        UPDATE t_question_info
+        SET question_name          = #{questionName,jdbcType=VARCHAR},
+            question_classify_id   = #{questionClassifyId,jdbcType=BIGINT},
+            question_grade         = #{questionGrade,jdbcType=TINYINT},
+            global_rule_id         = #{globalRuleId,jdbcType=BIGINT},
+            is_force_order         = #{isForceOrder,jdbcType=TINYINT},
+            customer_name          = #{customerName,jdbcType=VARCHAR},
+            customer_gender        = #{customerGender,jdbcType=TINYINT},
+            customer_bank_card     = #{customerBankCard,jdbcType=VARCHAR},
+            customer_arrears       = #{customerArrears,jdbcType=BIGINT},
+            customer_min_repayment = #{customerMinRepayment,jdbcType=BIGINT},
+            customer_overdue       = #{customerOverdue,jdbcType=INTEGER},
+            customer_delay_stage   = #{customerDelayStage,jdbcType=VARCHAR},
+            create_time            = #{createTime,jdbcType=TIMESTAMP},
+            update_time            = #{updateTime,jdbcType=TIMESTAMP},
+            delete_status          = #{deleteStatus,jdbcType=TINYINT}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <sql id="selectByFilter_where">
+        <where>
+            <if test="filter.deleteStatus != null">
+                and delete_status = #{filter.deleteStatus}
+            </if>
+            <if test="filter.questionId != null">
+                and id = #{filter.questionId}
+            </if>
+            <if test="filter.questionName != null">
+                <bind name="question_name_like" value="'%' + filter.questionName + '%'"/>
+                and question_name LIKE #{question_name_like}
+            </if>
+            <if test="filter.questionClassifyId != null">
+                and question_classify_id = #{filter.questionClassifyId}
+            </if>
+            <if test="filter.questionGrade != null">
+                and question_grade = #{filter.questionGrade}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectByFilter" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_question_info
+        <include refid="selectByFilter_where"/>
+        order by update_time DESC
+        <if test="page != null">
+            limit #{page.offset}, #{page.pageSize}
+        </if>
+    </select>
+    <select id="selectCountByFilter" resultType="java.lang.Long">
+        select
+        count(1)
+        from t_question_info
+        <include refid="selectByFilter_where"/>
+    </select>
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TPaperMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TPaper">
+        <id column="paper_id" property="paperId" />
+        <result column="paper_name" property="paperName" />
+        <result column="level" property="level" />
+        <result column="intro" property="intro" />
+        <result column="paper_category_id" property="paperCategoryId" />
+        <result column="type" property="type" />
+        <result column="pass_score" property="passScore" />
+        <result column="time_limit" property="timeLimit" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        paper_id, paper_name, level, intro, paper_category_id, type, pass_score, time_limit
+    </sql>
+
+    <select id="findAll" resultType="com.zhuiyi.ms.learn.entity.TPaper">
+        SELECT
+            paper_id,
+            time_limit,
+            paper_category_id,
+            create_time,
+            level,
+            paper_name,
+            intro,
+            update_time,
+            type,
+            pass_score,
+            need_reset
+        FROM
+            t_paper
+        <where>
+            <if test="type != null">
+                type = #{type}
+            </if>
+            <if test="level != null">
+                and level = #{level}
+            </if>
+            <if test="paperId != null and paperName != null">
+                and ( paper_id = #{paperId} or paper_name LIKE "%"#{paperName}"%" )
+            </if>
+            <if test="paperId == null and paperName != null">
+                and paper_name LIKE "%"#{paperName}"%"
+            </if>
+            <if test="categoryIdList != null and categoryIdList.size() > 0">
+                AND paper_category_id IN
+                <foreach collection="categoryIdList" item="item" index="index"  open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY need_reset desc , update_time desc
+    </select>
+
+    <select id="findAllByQuestionId" resultType="com.zhuiyi.ms.learn.entity.TPaper">
+        SELECT DISTINCT
+            p.paper_id,
+            p.paper_name
+        FROM
+            t_paper p,
+            t_paper_part pp,
+            t_part_question pq
+        WHERE
+            p.paper_id = pp.paper_id
+          AND pq.paper_part_id = pp.paper_part_id
+          AND pq.part_question_id = #{questionId};
+    </select>
+
+    <select id="findAllByPartIdList" resultType="com.zhuiyi.ms.learn.entity.TPaper">
+        SELECT
+        t_paper.paper_id
+        FROM
+        t_paper,
+        t_paper_part
+        WHERE
+        t_paper.paper_id = t_paper_part.paper_id
+        AND t_paper_part.paper_part_id
+        IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>;
+    </select>
+
+</mapper>

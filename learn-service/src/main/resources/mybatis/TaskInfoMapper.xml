@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TaskInfoMapper">
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TaskInfo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="question_id" jdbcType="BIGINT" property="questionId"/>
+        <result column="task_type" jdbcType="TINYINT" property="taskType"/>
+        <result column="service_id" jdbcType="VARCHAR" property="serviceId"/>
+        <result column="service_name" jdbcType="VARCHAR" property="serviceName"/>
+        <result column="score" jdbcType="INTEGER" property="score"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="delete_status" jdbcType="TINYINT" property="deleteStatus"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, question_id, task_type, service_id, service_name, score, status, start_time, create_time,
+    update_time, delete_status
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_task_info
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <insert id="insert" parameterType="com.zhuiyi.ms.learn.entity.TaskInfo">
+    insert into t_task_info (id, question_id, task_type, service_id,
+      service_name, score, status, 
+      start_time, create_time, update_time, 
+      delete_status)
+    values (#{id,jdbcType=BIGINT}, #{questionId,jdbcType=BIGINT}, #{taskType,jdbcType=TINYINT}, #{serviceId,jdbcType=VARCHAR},
+      #{serviceName,jdbcType=VARCHAR}, #{score,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{deleteStatus,jdbcType=TINYINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.zhuiyi.ms.learn.entity.TaskInfo" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into t_task_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="questionId != null">
+                question_id,
+            </if>
+            <if test="taskType != null">
+                task_type,
+            </if>
+            <if test="serviceId != null">
+                service_id,
+            </if>
+            <if test="serviceName != null">
+                service_name,
+            </if>
+            <if test="score != null">
+                score,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="deleteStatus != null">
+                delete_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="questionId != null">
+                #{questionId,jdbcType=BIGINT},
+            </if>
+            <if test="taskType != null">
+                #{taskType,jdbcType=TINYINT},
+            </if>
+            <if test="serviceId != null">
+                #{serviceId,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceName != null">
+                #{serviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="score != null">
+                #{score,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhuiyi.ms.learn.entity.TaskInfo">
+        update t_task_info
+        <set>
+            <if test="questionId != null">
+                question_id = #{questionId,jdbcType=BIGINT},
+            </if>
+            <if test="taskType != null">
+                task_type = #{taskType,jdbcType=TINYINT},
+            </if>
+            <if test="serviceId != null">
+                service_id = #{serviceId,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceName != null">
+                service_name = #{serviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="score != null">
+                score = #{score,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteStatus != null">
+                delete_status = #{deleteStatus,jdbcType=TINYINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhuiyi.ms.learn.entity.TaskInfo">
+        UPDATE t_task_info
+        SET question_id   = #{questionId,jdbcType=BIGINT},
+            task_type     = #{taskType,jdbcType=TINYINT},
+            service_id    = #{serviceId,jdbcType=VARCHAR},
+            service_name  = #{serviceName,jdbcType=VARCHAR},
+            score         = #{score,jdbcType=INTEGER},
+            status        = #{status,jdbcType=TINYINT},
+            start_time    = #{startTime,jdbcType=TIMESTAMP},
+            create_time   = #{createTime,jdbcType=TIMESTAMP},
+            update_time   = #{updateTime,jdbcType=TIMESTAMP},
+            delete_status = #{deleteStatus,jdbcType=TINYINT}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <sql id="selectByFilter_where">
+        <where>
+            <if test="filter.taskId != null">
+                and t_ti.id = #{filter.taskId}
+            </if>
+            <if test="filter.questionName != null">
+                <bind name="question_name_like" value="'%' + filter.questionName + '%'" />
+                and t_qi.question_name like #{question_name_like}
+            </if>
+            <if test="filter.taskType != null">
+                and t_ti.task_type = #{filter.taskTpye}
+            </if>
+            <if test="filter.status != null">
+                and t_ti.status = #{filter.status}
+            </if>
+            <if test="filter.deleteStatus != null">
+                and t_ti.delete_status = #{filter.deleteStatus}
+            </if>
+        </where>
+    </sql>
+
+    <resultMap id="selectByFilterMap" type="com.zhuiyi.ms.learn.entity.vo.TaskInfoVo">
+        <result column="id" property="taskId" />
+        <result column="question_id" property="questionId" />
+        <result column="question_name" property="questionName" />
+        <result column="status" property="status" />
+        <result column="task_type" property="taskType" />
+        <result column="service_id" property="serviceId" />
+        <result column="service_name" property="serviceName" />
+        <result column="score" property="score" />
+        <result column="start_time" property="startTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="selectByFilter" resultMap="selectByFilterMap">
+        select
+          t_ti.id, t_ti.question_id, t_qi.question_name, t_ti.status, t_ti.task_type, t_ti.service_id,
+          t_ti.service_name, t_ti.score, t_ti.start_time, t_ti.create_time, t_ti.update_time
+        from t_task_info as t_ti
+        inner join t_question_info as t_qi
+        on t_ti.question_id = t_qi.id
+        <include refid="selectByFilter_where" />
+        order by t_ti.update_time desc
+        <if test="page != null">
+            limit #{page.offset}, #{page.pageSize}
+        </if>
+    </select>
+
+    <select id="selectCountByFilter" resultType="java.lang.Long">
+        select
+        count(1)
+        from t_task_info as t_ti
+        inner join t_question_info as t_qi
+        on t_ti.question_id = t_qi.id
+        <include refid="selectByFilter_where" />
+    </select>
+</mapper>

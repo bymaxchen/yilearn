@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.GuanghuaRecordMapper">
+
+	<insert id="saveRecord" useGeneratedKeys="true" keyProperty="id"
+			parameterType="com.zhuiyi.ms.learn.dto.request.GuangHuaRecordDto">
+		INSERT INTO t_guanghua_record (
+		  status,data,exception,start_time,update_time,dbName
+		)
+		VALUES (
+		#{status,jdbcType=VARCHAR},
+		#{data,jdbcType=INTEGER},
+		#{exception,jdbcType=VARCHAR},
+		#{startTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP},
+		#{dbName,jdbcType=VARCHAR}
+		)
+	</insert>
+
+
+	<select id="getFailRecord" resultType="com.zhuiyi.ms.learn.dto.request.GuangHuaRecordDto">
+		select  a.id as id, a.status as status, a.data as data, a.start_time as startTime,a.dbName as dbName
+		from t_guanghua_record a
+		where a.status = 1 ;
+	</select>
+
+	<delete id="deleteRecord" parameterType="java.lang.Integer">
+		delete  from t_guanghua_record   where  id = #{id};
+	</delete>
+
+	<update id="updateRecord" parameterType="com.zhuiyi.ms.learn.dto.request.GuangHuaRecordDto">
+		update t_guanghua_record
+		<set>
+			<if test="exception != null">exception = #{exception},</if>
+			<if test="updateTime != null">update_time = #{updateTime},</if>
+			<if test="status != null">status = #{status}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<update id="updateRecordStatus" parameterType="java.util.HashMap">
+		update t_guanghua_record set status = 0
+		where id = #{id} and status = #{status}
+	</update>
+
+
+</mapper>

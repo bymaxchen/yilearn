@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhuiyi.ms.learn.mapper.TQuestionCategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhuiyi.ms.learn.entity.TQuestionCategory">
+        <id column="question_category_id" property="questionCategoryId" />
+        <result column="question_category_name" property="questionCategoryName" />
+        <result column="lft" property="lft" />
+        <result column="rgt" property="rgt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        question_category_id, question_category_name, lft, rgt
+    </sql>
+    
+    <select id="findAllWithDepth" resultType="com.zhuiyi.ms.learn.entity.TQuestionCategory">
+        SELECT node.question_category_id, node.question_category_name, node.lft, node.rgt, node.can_operate,  (COUNT(parent.question_category_id) - 1) AS depth
+        FROM t_question_category AS node,
+             t_question_category AS parent
+        WHERE node.lft BETWEEN parent.lft AND parent.rgt
+          AND node.type = #{type}
+          AND parent.type = #{type}
+        GROUP BY node.question_category_id
+        ORDER BY node.lft DESC;
+    </select>
+
+    <select id="findAllWithQuestionCount" resultType="com.zhuiyi.ms.learn.entity.TQuestionCategory">
+        SELECT parent.question_category_id, COUNT(t_base_question.base_question_id) as questionCount
+        FROM t_question_category AS node ,
+             t_question_category AS parent,
+             t_base_question
+        WHERE node.lft BETWEEN parent.lft AND parent.rgt
+            AND node.question_category_id = t_base_question.question_category_id
+            AND node.type = #{type}
+            AND parent.type = #{type}
+        GROUP BY parent.question_category_id
+        ORDER BY node.lft;
+    </select>
+
+    <update id="updateForDelete">
+        UPDATE t_question_category SET rgt = rgt - #{width} WHERE rgt > #{rgt};
+        UPDATE t_question_category SET lft = lft - #{width} WHERE lft > #{rgt};
+    </update>
+
+    <update id="updateForCreate">
+        UPDATE t_question_category SET rgt = rgt + 2 WHERE rgt > #{parentLft};
+        UPDATE t_question_category SET lft = lft + 2 WHERE lft > #{parentLft};
+    </update>
+
+    <update id="moveNode">
+        UPDATE t_question_category SET lft = lft + #{width} WHERE lft &gt;= #{newPos};
+        UPDATE t_question_category SET rgt = rgt + #{width} WHERE rgt &gt;= #{newPos};
+
+        UPDATE t_question_category SET lft = lft + #{distance}, rgt = rgt + #{distance}
+        WHERE lft &gt;= #{tmpPos} AND rgt &lt; #{tmpPos} + #{width};
+
+        UPDATE t_question_category SET lft = lft - #{width} WHERE lft &gt; #{oldRPos};
+        UPDATE t_question_category SET rgt = rgt - #{width} WHERE rgt &gt; #{oldRPos};
+    </update>
+
+
+
+</mapper>
